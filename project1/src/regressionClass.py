@@ -45,6 +45,36 @@ class Regression:
         """
         self.lamb = newLamb
     
+    def computeRegression(self, method, X, y):
+        """
+        ! Uses Python 3.10 functionality !  match - case
+
+        Executes the regression specified by method
+
+        Parameters
+        -----------------
+        method : string
+                    The regression case to be executed
+                    Available methods:
+                        'ols', 'ridge', 'lasso'
+
+        X : numpy.array (N, M)
+            design matrix. 
+        
+        y : numpy.array (N, 1)
+            the input vector of the linear model
+        """
+        match method:
+            case 'ols':
+                self.computeOLSRegression(X, y)
+            case 'ridge':
+                self.computeRidgeRegression(X, y)
+            case 'lasso':
+                self.computeLassoRegression(X, y)
+            case deafult:
+                print('Regression method not recognized')
+
+
     def computeOLSRegression(self, X, y):
         """
         Execute to compute the linear regression
