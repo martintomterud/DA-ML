@@ -20,18 +20,28 @@ class Regression:
         
     """
 
-    def __init__(self, lamb):
+    def __init__(self, method):
         """
         Initialises the class
+        Sets all class variables to None
 
-        Paramterers
+        Parameters
         -----------------
-
-        lamb: numpy.float
-            lambda paramter for use in ridge and lasso
-
+        method : string
+                    The regression case to be executed
+                    Available methods:
+                        'ols', 'ridge', 'lasso'
         """
-        self.lamb = lamb
+        self.method = method    #Least square method
+        self.X = None           #Design matrix
+        self.y = None           #Data
+        self.yTilde = None      #Prediction
+        self.beta = None        #Computed least square method
+        self.lamb = 0.0         #Strength for use in ridge and lasso
+        self.mse = None         #Mean square error
+        self.r2 = None          #R2 score
+        self.beta_var = None    #Variance of computed beta
+
     
     def getLamb(self):
         """
@@ -45,7 +55,7 @@ class Regression:
         """
         self.lamb = newLamb
     
-    def computeRegression(self, method, X, y):
+    def computeRegression(self, X, y):
         """
         ! Uses Python 3.10 functionality !  match - case
 
@@ -64,7 +74,7 @@ class Regression:
         y : numpy.array (N, 1)
             the input vector of the linear model
         """
-        match method:
+        match self.method:
             case 'ols':
                 self.computeOLSRegression(X, y)
             case 'ridge':
@@ -149,7 +159,7 @@ class Regression:
         X_T = self.X.T
         #find dimension p of matrix to generate correctly sized identity matrix
         M = np.shape(self.X)[1]
-        Gamma = self.lamp * np.identity(M)
+        Gamma = self.lamb * np.identity(M)
         self.beta = pinv(X_T.dot(self.X) + Gamma).dot(X_T).dot(self.y)
 
     def lasso(self):
@@ -179,7 +189,7 @@ class Regression:
 
         self.beta = clf.coef_
 
-    def makePrediction(self, X):
+    def makePrediction(self):
         """
         Make prediction using computed beta for general matrix
         X
@@ -187,15 +197,59 @@ class Regression:
         Parameters
         -----------
 
-        X : ndarray (N, M)
+        none, taken from self
 
-        Returns
+        Computes
         -----------------
         
-        tildeY : ndarray (N, 1)
+        yTilde : ndarray (N, 1)
 
-        Prediction based oninput data and computed beta. Defined in 
+        Prediction based on input data and computed beta. Defined in 
         equations in the report
 
         """
-        return np.dot(X, self.beta)
+        if self.beta is None:
+            print('Linear regression not performed \n')
+            print('Exiting prediction')
+            return 0
+        self.yTilde = np.dot(self.X, self.beta)
+
+    
+    def stat_mse(self):
+        """
+        Parameters
+        -----------
+
+        none, taken from self
+
+        Computes
+        -----------------
+        Mean square error : float
+            mse of prediction and y data
+        """
+        if self.yTilde is None:
+            print('Prediction has not been computed \n')
+            print('Exiting statistics')
+            return 0
+        N = self.y.size
+        self.mse = np.sum((self.y - self.yTilde))**2 / N
+
+    def stat_r2(self):
+        """
+        Parameters
+        -----------
+
+        none, taken from self
+
+        Computes
+        -----------------
+        r2 score : float
+            r2 score of prediction and y data
+        """
+        if self.yTilde is None:
+            print('Prediction has not been computed \n')
+            print('Exiting statistics')
+            return 0
+        N = self.y.size
+        yMean = np.sum(self.y) / N
+        self.r2 = 1 - np.sum((self.y - self.yTilde)**2) / np.sum((self.y - yMean)**2)        
