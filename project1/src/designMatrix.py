@@ -30,7 +30,7 @@ class designMatrix:
         M = int((deg + 1)*(deg + 2) / 2)
         self.X = np.ones((N, M))
     
-    def designMatrix(self, x, y, deg):
+    def generateDesignMatrix(self, x, y, deg):
         """
         Constructor for design matrix
 
@@ -50,7 +50,7 @@ class designMatrix:
         self.X = np.ones((N, M))
 
         for i in range(1, deg + 1):
-            j = int(i*(i+2)/2)
+            j = int(i*(i+1)/2)
             for k in range(i + 1):
                 self.X[:, j + k] = x**(i - k) * y**(k)
     
