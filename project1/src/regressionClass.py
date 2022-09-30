@@ -156,7 +156,7 @@ class Regression:
         In case of singular matrix, computes pseudo inverse using 
         scipy.linalg.pinv
         """
-        X_T = self.X.T
+        X_T = (self.X).T
         #find dimension p of matrix to generate correctly sized identity matrix
         M = np.shape(self.X)[1]
         Gamma = self.lamb * np.identity(M)
@@ -260,7 +260,7 @@ class Regression:
             print('Exiting statistics')
             return 0
         N = self.y.size
-        self.mse = np.sum((self.y - self.yTilde))**2 / N
+        self.mse = np.sum((self.y - self.yTilde)**2) / N
 
     def stat_r2(self):
         """
