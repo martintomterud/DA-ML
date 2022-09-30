@@ -193,6 +193,7 @@ class Regression:
         """
         Make prediction using computed beta for general matrix
         X
+        Sets the prediction as class variable
 
         Parameters
         -----------
@@ -213,6 +214,33 @@ class Regression:
             print('Exiting prediction')
             return 0
         self.yTilde = np.dot(self.X, self.beta)
+
+    def returnPrediction(self, X):
+        """
+        Computes prediction from input matrix X
+        For use in resampling techniques. 
+        Does not set prediction, but returns predicted array.
+
+        Parameters
+        -----------
+
+        X : ndarray, design matrix
+
+        Computes
+        -----------------
+        
+        yTilde : ndarray (N, 1)
+
+        Prediction based on input data and computed beta. Defined in 
+        equations in the report
+
+        """
+        if self.beta is None:
+            print('Linear regression not performed \n')
+            print('Exiting prediction')
+            return 0
+        return np.dot(self.X, self.beta)
+
 
     
     def stat_mse(self):
