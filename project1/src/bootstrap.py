@@ -1,9 +1,10 @@
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
+
 
 import regressionClass
 import designMatrix
+import dataFunctions
 
 class Bootstrap:
 
@@ -23,7 +24,7 @@ class Bootstrap:
         Uses the regression object from initialization
         Assumes regression already done
 
-        Parameters
+        Parameters0
         ---------------
         k : int
             number of "folds", i.e. how many times we perform the algorithm
@@ -33,6 +34,8 @@ class Bootstrap:
         Algorithm follows the bootstrap algorithm on this link:
         https://compphysics.github.io/MachineLearning/doc/LectureNotes/_build/html/chapter3.html#the-bias-variance-tradeoff
         but loops over all k fold values to compute beta statistics
+
+        Computes statistics on predictions and betas and sets them as class variables.
         
         """
 
@@ -61,15 +64,21 @@ class Bootstrap:
             y_trainPredictions[:, i] = self.regressionObject.returnPrediction(X_idx)
             y_bootstrap[:, i] = y_idx
             self.BETA[:, i] = self.regressionObject.beta
-            r2[i] = r2_score(yPredictions[:, i], y_test)
+            r2[i] = dataFunctions.r2(yPredictions[:, i], y_test) 
         
         # error scores set as class params
-        self.mean_mse = np.mean(np.mean((yPredictions - y_test)**2), axis = 1, keepdims = True)
-        self.mean_mse_train =  np.mean(np.mean((y_trainPredictions - y_bootstrap)**2), axis = 1, keepdims = True)
-        self.yBias = np.mean( (y_test - np.mean(yPredictions, axis=1, keepdims=True))**2)
-        self.yPrecitionsVariance = np.mean(np.var(yPredictions, axis=1, keepdims=True))
+        self.mse = dataFunctions.mse(yPredictions, y_test)
+        self.mseTrain = dataFunctions.mse(y_trainPredictions, y_bootstrap)
+        self.r2 = np.mean(r2) 
+        self.yBias = dataFunctions.bias(y_test, yPredictions) 
+        self.yPrecitionsVariance = dataFunctions.variance(yPredictions) 
         self.betaVariance = np.var(self.BETA, axis = 1)
         self.betaMean = np.mean(self.BETA, axis = 1)
 
         print('Bootstrap complete. Stat set as class variables.')
 
+    def returnStats(self):
+        return self.mse, self.mseTrain, self.r2, self.yBias, self.yPredictionsVariance
+    
+    def returnBetas(self):
+        return self.betaMean, self.betaVariance
