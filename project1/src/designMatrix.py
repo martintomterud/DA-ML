@@ -54,4 +54,7 @@ class designMatrix:
             for k in range(i + 1):
                 self.X[:, j + k] = x**(i - k) * y**(k)
     
+    def returnMatrix(self):
+        return self.X
+    
 
