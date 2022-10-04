@@ -144,7 +144,11 @@ class Regression:
         scipy.linalg.pinv
         """
         X_T = self.X.T
-        self.beta = pinv(X_T.dot(self.X)).dot(X_T).dot(self.y)
+        M_to_invert = X_T.dot(self.X)
+        u, s, v = np.linalg.svd(M_to_invert)
+        M_inv = np.dot(v.transpose(), np.dot(np.diag(s**-1), u.transpose()))
+        self.beta = M_inv.dot(X_T).dot(self.y)
+        # self.beta = pinv(X_T.dot(self.X)).dot(X_T).dot(self.y)
     
     def ridge(self):
         """
@@ -239,7 +243,7 @@ class Regression:
             print('Linear regression not performed \n')
             print('Exiting prediction')
             return 0
-        return np.dot(self.X, self.beta)
+        return X @ self.beta
 
 
     

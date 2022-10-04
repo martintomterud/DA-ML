@@ -67,11 +67,11 @@ class Bootstrap:
             r2[i] = dataFunctions.r2(yPredictions[:, i], y_test) 
         
         # error scores set as class params
-        self.mse = dataFunctions.mse(yPredictions, y_test)
+        self.mse = dataFunctions.mse(np.mean(yPredictions), y_test)
         self.mseTrain = dataFunctions.mse(y_trainPredictions, y_bootstrap)
         self.r2 = np.mean(r2) 
         self.yBias = dataFunctions.bias(y_test, yPredictions) 
-        self.yPrecitionsVariance = dataFunctions.variance(yPredictions) 
+        self.yPredictionsVariance = dataFunctions.variance(yPredictions) 
         self.betaVariance = np.var(self.BETA, axis = 1)
         self.betaMean = np.mean(self.BETA, axis = 1)
 
