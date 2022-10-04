@@ -264,10 +264,10 @@ def var_bias():
 
     axs[0].plot(degrees, mse_1, color = 'blue', lw = 2, alpha = 0.8, marker = '^', label = 'MSE')
     axs[0].plot(degrees, var_1, ls = 'dashed', color = 'blue', lw = 2, alpha = 0.6, marker = 's', label = 'Variance')
-    axs[0].plot(degrees, bias_1, ls = 'dotted', color = 'blue', lw = 2, alpha = 0.4, marker = 'o', label = 'Bias')
+    axs[0].plot(degrees, bias_1, ls = 'dotted', color = 'blue', lw = 2, alpha = 0.4, marker = 'o', label = r'Bias$^2$')
     axs[1].plot(degrees, mse_2, color = 'red', lw = 2, alpha = 0.8, marker = '^', label = 'MSE')
     axs[1].plot(degrees, var_2, ls = 'dashed', color = 'red', lw = 2, alpha = 0.6, marker = 's', label = 'Variance')
-    axs[1].plot(degrees, bias_2, ls = 'dotted', color = 'red', lw = 2, alpha = 0.4, marker = 'o', label = 'Bias')
+    axs[1].plot(degrees, bias_2, ls = 'dotted', color = 'red', lw = 2, alpha = 0.4, marker = 'o', label = r'Bias$^2$')
     
     axs[0].legend(frameon = False)
     axs[1].legend(frameon = False)
