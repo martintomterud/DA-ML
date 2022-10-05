@@ -162,7 +162,7 @@ def main_OLS():
     axs[1].plot(degrees, r2CV_2, color = 'magenta', lw = 2, alpha = 0.6, marker = 'v', mfc = 'none')
     axs[0].set_ylim(0.005, 0.045)
     axs[0].legend(frameon = False)
-    plt.savefig(figpath+'ols_stat.pdf', dpi = 800, bbox_inches = 'tight')
+    #plt.savefig(figpath+'ols_stat.pdf', dpi = 800, bbox_inches = 'tight')
     plt.show() 
     '''
     fig, ax = plt.subplots()
@@ -282,7 +282,7 @@ def var_bias():
     plt.show()
 
 def beta_var():
-    cd = os.path.abspath('.')
+    cd = os.path.abspath('..')
     figpath = cd + "/figures/"
     # Set up start parameters
     #reg method
@@ -318,14 +318,14 @@ def beta_var():
     regOb_1 = regressionClass.Regression(method)
     regOb_1.computeRegression(X_1, frankeData_1)
     beta_1 = regOb_1.beta
-    error_1 = fStd*np.sqrt(np.diag( np.linalg.inv( X_1.T @ X_1 )) )*confInt
+    error_1 = fStd*np.sqrt(np.diag( np.linalg.inv( X_1.T @ X_1 )) )
 
     # set 2
     X_2 = dataFunctions.generateDesignMatrix(x_2, y_2, polydeg)
     regOb_2 = regressionClass.Regression(method)
     regOb_2.computeRegression(X_2, frankeData_2)
     beta_2 = regOb_2.beta
-    error_2 = fStd*np.sqrt(np.diag( np.linalg.inv( X_2.T @ X_2 )) )*confInt
+    error_2 = fStd*np.sqrt(np.diag( np.linalg.inv( X_2.T @ X_2 )) )
 
     # figure
 
