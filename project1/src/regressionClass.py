@@ -178,12 +178,10 @@ class Regression:
         """
 
         clf = skl.Lasso(alpha=self.lamb, 
-         fit_intercept=True, 
-         normalize='deprecated', 
+         fit_intercept=False,  
          precompute=False, 
-         copy_X=True, 
-         max_iter=1000, 
-         tol=0.0001, 
+         max_iter=int(1e3), 
+         tol=0.001, 
          warm_start=False, 
          positive=False, 
          random_state=None, 
