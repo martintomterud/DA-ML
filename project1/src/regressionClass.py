@@ -164,7 +164,11 @@ class Regression:
         #find dimension p of matrix to generate correctly sized identity matrix
         M = np.shape(self.X)[1]
         Gamma = self.lamb * np.identity(M)
-        self.beta = pinv(X_T.dot(self.X) + Gamma).dot(X_T).dot(self.y)
+        Mat_to_invert = X_T.dot(self.X) + Gamma
+        u, s, v = np.linalg.svd(Mat_to_invert)
+        M_inv = np.dot(v.transpose(), np.dot(np.diag(s**-1), u.transpose()))
+        self.beta = M_inv.dot(X_T).dot(self.y)
+        #self.beta = pinv(X_T.dot(self.X) + Gamma).dot(X_T).dot(self.y)
 
     def lasso(self):
         """
