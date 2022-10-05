@@ -1,3 +1,4 @@
+from re import T
 import numpy as np 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import *
@@ -5,6 +6,8 @@ from sklearn.utils import shuffle, resample
 import random 
 import designMatrix
 import regressionClass
+from imageio import imread
+
 
 def meshgrid(N):
     """
@@ -269,5 +272,32 @@ def crossValidation(x, y, yData, method, lamb, deg, k):
     
 
 
+def importTerrain(file):
+    """
+    Imports the terrain file and returns data
+    """
+    terrain = imread(file)
+    return terrain
 
+def terrainGridRegion(terrain, size):
+    """
+    Picks out random size x size region in the terrain grid
+    """
+    xlen = np.shape(terrain)[0]
+    ylen = np.shape(terrain)[1]
+    x_rand = np.random.randint(0, xlen - size)
+    y_rand = np.random.randint(0, ylen - size)
+    region = terrain[x_rand : x_rand + size, y_rand : y_rand + size]
+    return region
+    
+def scaleTerrain(terrain):
+    """
+    Scales terrain data by first subtracting minimum
+    and the normalizes by dividing by max
+    """
+    max = np.amax(terrain)
+    min = np.amin(terrain)
+    t = np.copy(terrain).astype(np.float64)
+    T = (t - min) / (max - min)
+    return T
 
