@@ -12,9 +12,6 @@ The project is organised as follows:
 
 - data contains the raw topological data files used
 
-- test contains modules used to test the code blocks
-
-- run contains scripts used to execute the source files
-
+- tex contains tex file and final pdf of report
 
 (To be updated as needed)
