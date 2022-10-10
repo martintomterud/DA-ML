@@ -172,7 +172,6 @@ def bootstrap_arrays(x, y, yData, regressionObject, deg, lamb, test_size, k):
     VAR = np.mean( np.var(yDataPredictions, axis=1, keepdims=True) )
     return [MSE, R2, BIAS, VAR]
     
-
 def crossValidation(x, y, yData, method, lamb, deg, k):
     
     """
@@ -270,11 +269,19 @@ def crossValidation(x, y, yData, method, lamb, deg, k):
 
     return [np.mean(MSE), np.mean(R2), np.mean(BIAS), np.mean(VAR)], BETAS
     
-
-
 def importTerrain(file):
     """
     Imports the terrain file and returns data
+
+    Parameters
+    ---------------
+    file : str
+            filename
+
+    Returns
+    ------------------
+    terrain: 2darray
+            generated terraindata from file
     """
     terrain = imread(file)
     return terrain
@@ -282,6 +289,20 @@ def importTerrain(file):
 def terrainGridRegion(terrain, size):
     """
     Picks out random size x size region in the terrain grid
+    Imports the terrain file and returns data
+
+    Parameters
+    ---------------
+    terrain : 2darray
+    
+    size : int
+            size (size x size) of terrain region we want
+
+    Returns
+    ------------------
+    region : 2darray
+            snip out of the terrain 
+ 
     """
     xlen = np.shape(terrain)[0]
     ylen = np.shape(terrain)[1]
@@ -294,6 +315,16 @@ def scaleTerrain(terrain):
     """
     Scales terrain data by first subtracting minimum
     and the normalizes by dividing by max
+
+    Parameters
+    ---------------
+    terrain : 2darray with terrain to normalize
+
+    Returns
+    ------------------
+    T : 2darray
+            normalized terrain
+
     """
     max = np.amax(terrain)
     min = np.amin(terrain)

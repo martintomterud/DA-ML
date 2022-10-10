@@ -278,7 +278,7 @@ def var_bias():
     axs[0].annotate(r'$N = 20 \times 20$', (0.9, 0.041))
     axs[1].annotate(r'$N = 50 \times 50$', (0.9, 0.041))
     
-    plt.savefig(figpath+'ols_bias_var.pdf', dpi = 800, bbox_inches = 'tight')
+    #plt.savefig(figpath+'ols_bias_var.pdf', dpi = 800, bbox_inches = 'tight')
     plt.show()
 
 def beta_var():
@@ -343,7 +343,7 @@ def beta_var():
     ax.errorbar(np.arange(1,len(beta_1)+1), beta_1, yerr=error_1 ,fmt='o', mfc = 'none', capsize = 5, linewidth = 3, alpha = 0.6, color = 'forestgreen', label = r'$N = 20 \times 20$')
     ax.errorbar(np.arange(1,len(beta_2)+1), beta_2, yerr=error_2 ,fmt='s', mfc = 'none', capsize = 5, linewidth = 2, alpha = 0.6, color = 'darkviolet', label = r'$N = 50 \times 50$')
     ax.legend(frameon = False)
-    plt.savefig(figpath+'beta_var.pdf', dpi = 800, bbox_inches = 'tight')
+    #plt.savefig(figpath+'beta_var.pdf', dpi = 800, bbox_inches = 'tight')
     plt.show()
 
 #main_OLS()

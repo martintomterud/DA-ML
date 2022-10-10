@@ -77,7 +77,7 @@ def mainOLS():
     """
 
     #polynomial degree and array
-    maxDegree = 14
+    maxDegree = 12
     degrees = np.arange(1, maxDegree + 1)
     #containers for storing statistics
     #regular run
@@ -125,7 +125,7 @@ def mainRL():
     # Set up start parameters
     
     #reg method
-    method = 'lasso'
+    method = 'ridge'
 
     #terraindata
     size = 1000 # M x M size of terrain region
@@ -148,9 +148,9 @@ def mainRL():
     maxDegree = 18
     degrees = np.arange(1, maxDegree + 1)
     #lambda array 
-    lambdas = np.logspace(0, -6, 7)
+    lambdas = np.logspace(-1, -7, 7)
     #lambdas = [0.01]
-    #lambdas[0] = 0
+    lambdas[0] = 0
     numlam = len(lambdas)
     #containers for storing statistics
     #regular run

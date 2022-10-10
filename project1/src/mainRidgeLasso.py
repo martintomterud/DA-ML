@@ -40,7 +40,7 @@ def MSE_RL():
     figpath = cd + "/figures/"
     # Set up start parameters
     #reg method
-    method = 'lasso'
+    method = 'ridge'
     # axes 
     N = int(50) 
     x = np.linspace(0,1,N)
@@ -139,7 +139,7 @@ def BI_VAR_RL():
     figpath = cd + "/figures/"
     # Set up start parameters
     #reg method
-    method = 'lasso'
+    method = 'ridge'
     # axes 
     N = int(20) 
     x = np.linspace(0,1,N)
