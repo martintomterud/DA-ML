@@ -24,3 +24,4 @@ Ridge and lasso uses the same function. Switch between 'ridge' and 'lasso' where
 - mainOLS.py : The main instance that performs OLS reg on the noisy Franke function and creates figures.
 - mainRidgeLasso.py : Performs ridge and lasso reg on Franke function. 
 - terrainMain.py : Contains all regression methods on the terrain data.
+- terrainFigure.py : Creates the terrain figure in the report. 
