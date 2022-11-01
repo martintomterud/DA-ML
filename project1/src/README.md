@@ -6,10 +6,10 @@ Use an updated python distribution when executing.
 ## Source codes
 
  - bootstrap.py : Class implementation of bootstrap resampling. No longer in use in final version.
- - designmMatrix.py : CLass implementation of design matrix. No longer in use in final version. 
- - franke.py : Functions that generate the franke function and a noisy version of the franke function.
+ - designMatrix.py : Class implementation of design matrix. No longer in use in final version. 
+ - franke.py : Functions that generate the Franke function and a noisy version of the Franke function.
  - regressionClass.py : Class implementation of the different regression intances, with functions that also compute predictions 
- - datafunctions.py : Different fuctions for loading terrain data, creating design matrix, performing bootstrap and k-fold cross validation and computing statistics
+ - dataFunctions.py : Different fuctions for loading terrain data, creating design matrix, performing bootstrap and k-fold cross validation and computing statistics
  
 ## Executing codes
 
