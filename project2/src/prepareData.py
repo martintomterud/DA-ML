@@ -2,7 +2,7 @@ from statistics import fmean
 import numpy as np
 from sklearn.model_selection import train_test_split
 
-import dataFunctions
+# import dataFunctions
 import franke
 
 ##########################################
@@ -65,16 +65,15 @@ def shuffleData(data):
 
     Param
     ---------------
-    data : aray like - data to shuffle
+    data : array like - data to shuffle
 
     Returns
     ---------------
     Shuffled version of data
 
     """
-    n = np.len(data)
-    perm = np.random.permutation(n)
-    return(data[perm])
+    rng = np.random.default_rng()
+    return rng.permutation(data)
 
 def generateDesignMatrix(x, y, degree):
     """
