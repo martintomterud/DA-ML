@@ -173,6 +173,56 @@ def RMSporp(x, y, startWeights, numBatches, numEpochs, learningRate, discountFac
             weights -= learningRate * gradient / np.sqrt(storedScaling)
     return weights
 
+def ADAM(x, y, startWeights, numBatches, numEpochs, learningRate, firstMomentFactor, secondMomentFactor, costFunction, *lamb):
+    """
+    RMS porp
+   
+    Algorithm based on lec notes from week 39, link
+    https://compphysics.github.io/MachineLearning/doc/pub/week39/html/week39.html
+
+    Parameters
+    -------------------
+    x :                 ndarray - Design matrix
+    y :                 1d array - Response / Input vector of model
+    startWeights :      1d array - Start weights
+    numBatches :        int - Number of batches to split permuted arrays into
+    numEpochs :         int - Number of epochs
+    learningRate :      float - The learning rate
+    firstMomentFactor :    float - The discount factor of first moment; deafult suggest at 0.9
+    secondMomentFactor :    float - The discount factor of second moment; deafult suggest at 0.9
+    costFunction :      function - pass to the fuction used to compute the gradient
+    *lamb :             float - optional of costFunctino requires lambda parameter
+
+    Returns
+    --------------------
+    weights : array - the best weights flund by the costFunction
+    
+    """
+    #Initialize out weights
+    weights = startWeights
+    firstMoment = 0
+    secondMoment = 0
+
+    #loop over number of epochs
+    for nE in range(numEpochs):
+        #split array into batches
+        permutationIndeces = np.random.permutation(len(x))
+        splitIndeces = np.array_split(permutationIndeces, numBatches)
+        #loop over batches
+        for nB in range(numBatches):
+            #pick out random batch and compute gradient
+            b = np.random.randint(numBatches)
+            gradient = costFunction(x[splitIndeces[b]], y[splitIndeces[b]], weights, *lamb) / x[splitIndeces[b]].shape[0]
+            #calculate first and second moments
+            firstMoment = firstMomentFactor * firstMoment + (1 - firstMomentFactor)*gradient
+            secondMoment = secondMomentFactor * secondMoment + (1 - secondMomentFactor)*np.dot(gradient, gradient)
+            #bias corrected first and second moment
+            firstMoment = firstMoment / (1 - firstMomentFactor)
+            secondMoment = secondMoment / (1 - secondMomentFactor)
+            #change weights according to learning rate 
+            weights -= learningRate * firstMoment / np.sqrt(secondMoment)
+    return weights
+
 #########################################
 # Typing up some cost functions as well #
 #   These are equivalent to project 1   #
