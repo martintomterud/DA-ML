@@ -1,6 +1,6 @@
 import numpy as np
 
-def sgd(x, y, startWeights, numBatches, numEpochs, learningRate, costFunction, *lamb):
+def SGD(x, y, startWeights, numBatches, numEpochs, learningRate, costFunction, *lamb):
     """
     SGD method 
     
