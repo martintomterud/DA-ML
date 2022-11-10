@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 
-import dataFunctions
+# import dataFunctions
 import franke
 
 ##########################################
@@ -81,16 +81,21 @@ def shuffleData(data):
 
     Param
     ---------------
-    data : aray like - data to shuffle
+    data : array like - data to shuffle
 
     Returns
     ---------------
     Shuffled version of data
 
     """
+<<<<<<< HEAD
     n = len(data)
     perm = np.random.permutation(n)
     return(data[perm])
+=======
+    rng = np.random.default_rng()
+    return rng.permutation(data)
+>>>>>>> daf7bca668bb87718cb14df85d8057cb83bcd2aa
 
 def generateDesignMatrix(x, y, degree):
     """
