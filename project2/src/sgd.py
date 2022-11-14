@@ -83,10 +83,10 @@ def sgdm(x, y, startWeights, numBatches, numEpochs, learningRate, momentum, cost
             gradient = costFunction(x[splitIndeces[b]], y[splitIndeces[b]], weights, *lamb) / x[splitIndeces[b]].shape[0]
             #change weights according to learning rate
             dweight = dweight * momentum - learningRate*gradient
-            weights += dweight
+            weights = weights + dweight
     return weights
 
-def adaptiveGradient(x, y, startWeights, numBatches, numEpochs, learningRate, costFunction, *lamb):
+def adaptiveGradient(x, y, startWeights, numBatches, numEpochs, momentum, learningRate, costFunction, *lamb):
     """
     Adaptiv gradient method
    
@@ -111,6 +111,7 @@ def adaptiveGradient(x, y, startWeights, numBatches, numEpochs, learningRate, co
     """
     #Initialize out weights
     weights = startWeights
+    dweight = 0
     gradientStore = np.zeros(len(startWeights))
 
     #loop over number of epochs
@@ -126,7 +127,8 @@ def adaptiveGradient(x, y, startWeights, numBatches, numEpochs, learningRate, co
             #store square gradient
             gradientStore += np.dot(gradient, gradient)
             #change weights according to learning rate 
-            weights -= learningRate * gradient / np.sqrt(gradientStore)
+            dweight =  dweight * momentum  - learningRate * gradient / np.sqrt(gradientStore)
+            weights = weights + dweight
     return weights
 
 def RMSporp(x, y, startWeights, numBatches, numEpochs, learningRate, discountFactor, costFunction, *lamb):
@@ -175,7 +177,7 @@ def RMSporp(x, y, startWeights, numBatches, numEpochs, learningRate, discountFac
 
 def ADAM(x, y, startWeights, numBatches, numEpochs, learningRate, firstMomentFactor, secondMomentFactor, costFunction, *lamb):
     """
-    RMS porp
+    Adam
    
     Algorithm based on lec notes from week 39, link
     https://compphysics.github.io/MachineLearning/doc/pub/week39/html/week39.html
@@ -202,12 +204,13 @@ def ADAM(x, y, startWeights, numBatches, numEpochs, learningRate, firstMomentFac
     weights = startWeights
     firstMoment = 0
     secondMoment = 0
-
+    iter = 0
     #loop over number of epochs
     for nE in range(numEpochs):
         #split array into batches
         permutationIndeces = np.random.permutation(len(x))
         splitIndeces = np.array_split(permutationIndeces, numBatches)
+        iter += 1
         #loop over batches
         for nB in range(numBatches):
             #pick out random batch and compute gradient
@@ -217,8 +220,8 @@ def ADAM(x, y, startWeights, numBatches, numEpochs, learningRate, firstMomentFac
             firstMoment = firstMomentFactor * firstMoment + (1 - firstMomentFactor)*gradient
             secondMoment = secondMomentFactor * secondMoment + (1 - secondMomentFactor)*np.dot(gradient, gradient)
             #bias corrected first and second moment
-            firstMoment = firstMoment / (1 - firstMomentFactor)
-            secondMoment = secondMoment / (1 - secondMomentFactor)
+            firstMoment = firstMoment / (1 - firstMomentFactor**iter)
+            secondMoment = secondMoment / (1 - secondMomentFactor**iter)
             #change weights according to learning rate 
             weights -= learningRate * firstMoment / np.sqrt(secondMoment)
     return weights

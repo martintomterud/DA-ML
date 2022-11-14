@@ -88,14 +88,8 @@ def shuffleData(data):
     Shuffled version of data
 
     """
-<<<<<<< HEAD
-    n = len(data)
-    perm = np.random.permutation(n)
-    return(data[perm])
-=======
     rng = np.random.default_rng()
     return rng.permutation(data)
->>>>>>> daf7bca668bb87718cb14df85d8057cb83bcd2aa
 
 def generateDesignMatrix(x, y, degree):
     """

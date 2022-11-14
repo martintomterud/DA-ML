@@ -1,16 +1,18 @@
+from tracemalloc import start
 import numpy as np
+from scipy.special import softmax
 
 def softMax(X, w):
     """
     Returns multiclass soft max function
     """
-    return np.exp(X@w)/np.sum(np.exp(X@w), axis = 1, keepdims=True)
+    return np.exp(X@w)/np.sum(np.exp(X@w), axis = 0, keepdims=True)
 
 def softMaxCost(X, Y, P):
     """
     Returns the soft max cost function
     """
-    return -1 * X.T @ (Y - P)
+    return  X.T @ (P - Y) 
 
 def logisticRegression(x, y, startWeights, numBatches, numEpochs, learningRate, momentum, lamb = 0):
 
@@ -46,7 +48,7 @@ def logisticRegression(x, y, startWeights, numBatches, numEpochs, learningRate, 
     """
     #Initialize out weights
     weights = startWeights
-    dweight = 0 #starts at 0 and is incremented
+    dweight = np.zeros(weights.shape) #starts at 0 and is incremented
 
     #loop over number of epochs
     for nE in range(numEpochs):
@@ -62,15 +64,15 @@ def logisticRegression(x, y, startWeights, numBatches, numEpochs, learningRate, 
             Y = y[splitIndeces[b]]
 
             #see theory section in report for derivation of the soft max and its derivative
-            probability = softMax(X, weights)
+            #probability = softMax(X, weights)
+            probability = softmax(X @ weights)
             gradient = softMaxCost(X, Y, probability)
-
+            #print(gradient)
+            
             #adds l2 reg term if it is non-zero
             if lamb:
                 gradient += lamb*weights 
-            
             #Update weights
-            dweight = dweight * momentum - learningRate*gradient
-            weights += dweight
-
+            dweight = dweight * momentum - learningRate*gradient / X.shape[0]
+            weights = dweight + weights
     return weights
