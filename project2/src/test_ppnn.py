@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.model_selection import GridSearchCV
 
 import neuralNet
 import prepareData
@@ -20,7 +21,8 @@ def main():
     batch_size = 200
     max_iter = 1000
     tol = 1e-5
-
+    leak = .1
+    init_scale = 1
 
     # param = {"alpha": np.concatenate((np.array([0.]), np.logspace(-10, 0, 11))), "learning_rate_init": np.linspace(.3, .5, 3)}
     # param = {"alpha": [0], "learning_rate_init": np.linspace(.3, .8, 3)}
@@ -30,10 +32,11 @@ def main():
 
     homemade = neuralNet.FFNN(
         model="regression",
+        activation="relu",
+        weight_dist="normal",
         hidden_layers=hidden_layers,
-        activation="sigmoid",
-        solver="sgd",
         alpha=alpha,
+        leak=leak,
         learning_rate=learning_rate,
         max_iter=max_iter,
         tol=tol,

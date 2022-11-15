@@ -13,13 +13,16 @@ class FFNN:
         model="regression",
         hidden_layers=[10,],
         activation="sigmoid",
-        solver="sgd",
+        # solver="sgd",
         alpha=0.,
+        leak=.01,
         learning_rate=.5,
         max_iter=200,
         tol=1e-4,
         # momentum=0.,
         batch_size=10,
+        weight_dist="normal",
+        init_scale=1.,
         rng=np.random.default_rng(),
         verbose=False,
         n_iter_no_change=10
@@ -27,14 +30,18 @@ class FFNN:
         self.model = model
         self.hidden_layers = hidden_layers
         self.activation = activation
-        self.solver = solver
+        # self.solver = solver
         self.alpha = alpha
+        self.leak = leak
         self.learning_rate = learning_rate
         self.max_iter = max_iter
         self.tol = tol
         # self.momentum = momentum
         self.batch_size = batch_size
+        self.weight_dist = weight_dist
+        self.init_scale = init_scale
         self.rng = rng
+
 
         self.verbose = verbose
         self.n_iter_no_change = n_iter_no_change
@@ -59,9 +66,18 @@ class FFNN:
 
             # Scale as suggested by Glorot et. al. (2010) 
             # (see report for full citation)
-            scale = np.sqrt(2./(dim_in + dim_out))
+            scale = self.init_scale * np.sqrt(2./(dim_in + dim_out))
 
-            self.weights.append(self.rng.normal(0., scale, (dim_in, dim_out)))
+            match self.weight_dist:
+                case "normal":
+                    self.weights.append(
+                        self.rng.normal(0., scale, (dim_in, dim_out))
+                    )
+                case "uniform":
+                    self.weights.append(
+                        self.rng.uniform(-scale, scale, (dim_in, dim_out))
+                    )
+
             self.intercepts.append(np.zeros(dim_out))
 
     def _feed_forward(self):
@@ -74,11 +90,20 @@ class FFNN:
             )
 
             if i != self.n_layers-2:
-                self.activations[i+1] = hidden_act(self.activations[i+1])
-
-        self.activations[self.n_layers-1] = (
-            out_act(self.activations[self.n_layers-1])
-        )
+                if self.activation == "leaky_relu":
+                    self.activations[i+1] = (
+                        hidden_act(self.activations[i+1], self.leak)
+                    )
+                else:
+                    self.activations[i+1] = hidden_act(self.activations[i+1])
+        if self.out_activation == "leaky_relu":
+            self.activations[self.n_layers-1] = (
+                out_act(self.activations[self.n_layers-1], self.leak)
+            )
+        else:
+            self.activations[self.n_layers-1] = (
+                out_act(self.activations[self.n_layers-1])
+            )
 
         return self.activations
 
@@ -114,8 +139,10 @@ class FFNN:
         # Iterate over the hidden layers
         for i in range(last, 0, -1):
             self.deltas[i-1] = self.deltas[i] @ self.weights[i].T
-            self.deltas[i-1] *= derivative(self.activations[i])
-
+            if self.activation == "leaky_relu":
+                self.deltas[i-1] *= derivative(self.activations[i], self.leak)
+            else:
+                self.deltas[i-1] *= derivative(self.activations[i])
             self._compute_loss_grad(i - 1)
 
         return loss
@@ -288,6 +315,18 @@ def sigmoid(x):
 def sigmoid_deriv(y):
     return y*(1.-y)
 
+def relu(x):
+    return np.maximum(x, 0.)
+
+def relu_deriv(y):
+    return np.heaviside(y, 0.)
+
+def leaky_relu(x, leak):
+    return np.maximum(leak*x, x)
+
+def leaky_relu_deriv(y, leak):
+    return np.heaviside(y, 0.) + leak * np.heaviside(-y, 1.)
+
 def id(x):
     return x
 
@@ -299,8 +338,20 @@ def cost_ols(y, pred):
     return np.dot(err, err)/len(y)
 
 
-ACTIVATION = {"sigmoid": sigmoid, "identity": id}
-DERIVATIVES = {"sigmoid": sigmoid_deriv, "identity": id_deriv}
+
+ACTIVATION = {
+    "identity": id,
+    "sigmoid": sigmoid,
+    "relu": relu,
+    "leaky_relu": leaky_relu
+}
+
+DERIVATIVES = {
+    "identity": id_deriv,
+    "sigmoid": sigmoid_deriv,
+    "relu": relu_deriv,
+    "leaky_relu": leaky_relu_deriv
+}
 
 
 
