@@ -18,7 +18,7 @@ class FFNN:
         learning_rate=.5,
         max_iter=200,
         tol=1e-4,
-        momentum=0.,
+        # momentum=0.,
         batch_size=10,
         rng=np.random.default_rng(),
         verbose=False,
@@ -32,7 +32,7 @@ class FFNN:
         self.learning_rate = learning_rate
         self.max_iter = max_iter
         self.tol = tol
-        self.momentum = momentum
+        # self.momentum = momentum
         self.batch_size = batch_size
         self.rng = rng
 
@@ -254,6 +254,32 @@ class FFNN:
         self.fitted = True
         return self
 
+
+    def predict(self, X):
+        if self.fitted:
+            self.activations[0] = X
+            self._feed_forward()
+
+            return self.activations[-1]
+        else:
+            print("Model is not fitted.")
+            return 1
+
+    def score(self, X, y):
+        return self.r2_score(X, y)
+
+    def r2_score(self, X, y):
+        y_pred = self.predict(X)
+
+        u = ((y - y_pred)**2).sum()
+        v = ((y - y.mean()) ** 2).sum()
+
+        return 1 - u/v
+    
+    def mse_score(self, X, y):
+        y_pred = self.predict(X)
+
+        return ((y - y_pred)**2).mean()
 
 
 def sigmoid(x):
