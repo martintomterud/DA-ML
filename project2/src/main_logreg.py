@@ -21,8 +21,8 @@ from sklearn.datasets import load_breast_cancer
 from sklearn import datasets
 from sklearn.utils import shuffle
 from sklearn.metrics import accuracy_score
-from sklearn.neural_network import MLPClassifier
 from sklearn.datasets import fetch_openml
+from sklearn.linear_model import LogisticRegression
 
 
 #scipy
@@ -48,11 +48,43 @@ parts e) of project 2
 
 """
 
-def main_logreg():
+def sklearn_test():
     """
-    Uses scikit learn functionality from
-    https://scikit-learn.org/stable/auto_examples/semi_supervised/plot_self_training_varying_threshold.html#sphx-glr-auto-examples-semi-supervised-plot-self-training-varying-threshold-py
-    to correctly handle importing the breast cancer data
+    Check what the accuracy should be using sklearns methods
+    """
+    #    Import breast cancer data
+    X, y = datasets.load_breast_cancer(return_X_y=True)
+    Ntot = len(y)
+    #Preprocess data: scale, shuffle and so on
+    X, y = shuffle(X, y, random_state=100)
+    #Split
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2)
+
+    #Logreg using scikit
+    logreg = LogisticRegression()
+    logreg.fit(X_train, y_train)
+
+    train_accuracy = logreg.score(X_test, y_test)
+
+    #Scale on train data
+    scaler = StandardScaler()
+    scaler.fit(X_train)
+    X_train_scaled = scaler.transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
+
+    #Fit scaled data
+    logreg.fit(X_train_scaled, y_train)
+    train_accuracy_scaled = logreg.score(X_test_scaled, y_test)
+
+    print(train_accuracy, train_accuracy_scaled)
+
+sklearn_test()
+
+def logreg_confmat():
+    """
+    Logistic regression to explore parameter space
+    in learing rates and l2 penalties and
+    plot confusion matrix
     """
     # Import breast cancer data
     X, y = datasets.load_breast_cancer(return_X_y=True)
@@ -61,62 +93,49 @@ def main_logreg():
     X, y = shuffle(X, y, random_state=100)
     #Split
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2)
-    
-    print(y_test)
-    #Logistic regression parameters
-    learningRates = np.logspace(-5, 0, 6)
-    totEpochs = 1000
-    epochsPerIteration = 10
-    numIterations = int(totEpochs/epochsPerIteration)
-    momentum = 1e-1
-    N = X_train.shape[0]
-    Nweights = X_train.shape[1]
-    #use batch sizes that makes sense with memory (i.e. multiples of 8 )
-    numBatches = [int(N / 64), int(N/128)]
 
-    #storage container for regression scores
-    regressionScores = np.zeros([2, len(learningRates), numIterations])
-    
-    #initial random weights
-    initialWeights = np.random.randn(Nweights)
-    print(initialWeights[0])
-    print(X_test)
-    #start loop for logreg
-    for i in range(len(numBatches)):
-        for j in range(len(learningRates)):
-            regressionWeights = logisticRegression.logisticRegression(
-                X_train,
-                y_train,
-                initialWeights,
-                numBatches[i],
-                epochsPerIteration,
-                learningRates[j],
-                momentum,
-                #lamb = 0.1
-            )
-            prediction = softmax(X_test @ regressionWeights)
-            score = accuracy_score(y_test, prediction)
-            regressionScores[i, j, 0] = score
-            for k in range(1, numIterations):
-                regressionWeights = logisticRegression.logisticRegression(
-                    X_train,
-                    y_train,
-                    regressionWeights,
-                    numBatches[i],
-                    epochsPerIteration,
-                    learningRates[j],
-                    momentum,
-                    #lamb = 0.1
-                )
-                prediction = softmax(X_test @ regressionWeights)
-                score = accuracy_score(y_test, prediction)
-                regressionScores[i, j, k] = score
-                #print(prediction)
-    
-    plt.figure()
-    x_axis = np.linspace(1, totEpochs, numIterations)
+    #Scale on train data as this gave better result from testing sklearn methods
+    scaler = StandardScaler()
+    scaler.fit(X_train)
+    X_train_scaled = scaler.transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
+
+    #Define test parameters
+    lambdas = np.logspace(-5, 0, 6)
+    learningRates = np.logspace(-6, -1, 6)
+
+    #Set constants for run
+    numMiniBatch = 128
+    numEpochs = 10
+    momentum = 0.7
+
+    #Storage container
+    accuracies = np.zeros([len(learningRates), len(lambdas)])
+
+    #Initial regression weights
+    startWeights = np.zeros(X_train.shape[1])
+    startWeights = np.random.randn(X_train.shape[1])
+    #Loop over learning rates and lambdas
     for i in range(len(learningRates)):
-        plt.plot(x_axis, regressionScores[0, i, :])
-    plt.show()
+        for j in range(len(lambdas)):
+            regWeights = logisticRegression.logisticRegression(
+                X_train_scaled,
+                y_train,
+                startWeights,
+                numMiniBatch,
+                numEpochs,
+                learningRates[i],
+                momentum,
+                lamb = lambdas[j]
+            )
+            arg = X_test_scaled @ regWeights
+            prediction = softmax(arg)
+            prediction = logisticRegression.prediction(X_test_scaled, regWeights)
+            classification = logisticRegression.classify(prediction)
+            score = accuracy_score(y_test, classification)
+            accuracies[i, j] = score
+    
+    print(accuracies)
 
-main_logreg()
+logreg_confmat()
+

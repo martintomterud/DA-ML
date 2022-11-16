@@ -1,4 +1,4 @@
-from tracemalloc import start
+
 import numpy as np
 from scipy.special import softmax
 
@@ -14,7 +14,56 @@ def softMaxCost(X, Y, P):
     """
     return  X.T @ (P - Y) 
 
+def sigmoid(x):
+    """
+    Returns sigmoid function
+    """
+    return 1.0 / (1 + np.exp(-x))
+
+def prediction(X, w):
+    """
+    Uses sigmoid to compute a prediction from design matrix and weights
+    """
+    arg = np.dot(X, w)
+    return sigmoid(arg)
+
+def costFunction(X, y, w):
+    """
+    Alternate implementation of cost function
+    """
+    N = len(y)
+    preds = prediction(X, w)
+    cost = np.zeros(N)
+    for i in range(N):
+        if preds[i] >= 0.5:
+            #Error term for y = 1
+            cost[i] = -1 * y[i] * np.log(preds[i])
+        else:
+            #Error term for y = 0
+            cost[i] = -1*(1 - y[i])* np.log(1 - preds[i])
+    #Total
+    #cost = true_cost - false_cost
+    #Compute average
+    avg_cost = cost.sum()/N
+    return avg_cost
+
+def classify(prediction):
+    classvec = np.zeros(len(prediction))
+    for i in range(len(prediction)):
+        if prediction[i] >= 0.5:
+            classvec[i] = 1
+    return classvec
+
+def newWeight(X, y, w, learninRate, momentum):
+    N = len(y)
+    preds = prediction(X, w)
+    gradient = np.dot(X.T, preds - y)
+    gradient = gradient /N * learninRate
+    w = w - gradient
+    return w
+
 def logisticRegression(x, y, startWeights, numBatches, numEpochs, learningRate, momentum, lamb = 0):
+
 
     """
     Logistic Regression for multiclass soft max function
@@ -76,3 +125,4 @@ def logisticRegression(x, y, startWeights, numBatches, numEpochs, learningRate, 
             dweight = dweight * momentum - learningRate*gradient / X.shape[0]
             weights = dweight + weights
     return weights
+
