@@ -47,15 +47,21 @@ class FFNN:
         self.n_iter_no_change = n_iter_no_change
 
         self.n_layers = len(hidden_layers) + 2
-        self.out_activation = "identity"
-        self.loss = "squared_error"
         self.layer_units = None
         self.weights = None
         self.intercepts = None
 
+        match self.model:
+            case "regression":
+                self.out_activation = "identity"
+                self.loss_func = "least_squares"
+            case "classification":
+                self.out_activation = "sigmoid"
+                self.loss_func = "log_loss"
+
         self.fitted = False
 
-    def _init_weights(self):
+    def init_weights(self):
         # Initialise the weights and intercepts.
         self.weights = []
         self.intercepts = []
@@ -80,7 +86,7 @@ class FFNN:
 
             self.intercepts.append(np.zeros(dim_out))
 
-    def _feed_forward(self):
+    def feed_forward(self):
         hidden_act = ACTIVATION[self.activation]
         out_act = ACTIVATION[self.out_activation]
 
@@ -105,34 +111,31 @@ class FFNN:
                 out_act(self.activations[self.n_layers-1])
             )
 
-        return self.activations
+        # return self.activations
 
-    def _backprop(self, X, y):
+    def backprop(self, X, y):
 
         # Propegate forward
-        self._feed_forward()
+        self.feed_forward()
 
-        # Propegate backwards
         last = self.n_layers - 2
 
-        err = self.activations[-1] - y
-        self.deltas[last] = err
+        self.deltas[last] = self.activations[-1] - y
 
         # Get loss
-        loss = .5 * (err.T @ err)[0,0] / self.n_samples
-        # loss = ((y - self.activations[-1]) ** 2).mean() / 2
-
+        loss_func = COST[self.loss_func]
+        loss = loss_func(y, self.activations[-1])
 
         # Add L2 regularization term to loss
         values = 0
         for s in self.weights:
             s = s.ravel()
             values += np.dot(s, s)
-        loss += (0.5 * self.alpha) * values / self.n_samples
+        loss += (.5 * self.alpha) * values / self.n_samples
 
 
         # Compute gradient for the last layer
-        self._compute_loss_grad(last)
+        self.loss_grad(last)
 
         derivative = DERIVATIVES[self.activation]
 
@@ -143,19 +146,16 @@ class FFNN:
                 self.deltas[i-1] *= derivative(self.activations[i], self.leak)
             else:
                 self.deltas[i-1] *= derivative(self.activations[i])
-            self._compute_loss_grad(i - 1)
+            self.loss_grad(i - 1)
 
         return loss
 
-    def _compute_loss_grad(self, layer):
-        """Compute the gradient of loss with respect to weights and intercept 
-        for specified layer. This function does backpropagation for the 
-        specified layer.
-        """
+    def loss_grad(self, layer):
+        """Compute the gradient of loss for specified layer."""
         self.weight_grads[layer] = (
             self.activations[layer].T @ self.deltas[layer]
         )
-        # self.weight_grads[layer] += self.alpha * self.weights[layer]
+        self.weight_grads[layer] += self.alpha * self.weights[layer]
         self.weight_grads[layer] /= self.n_samples
 
         self.intercept_grads[layer] = np.mean(self.deltas[layer], 0)
@@ -173,7 +173,7 @@ class FFNN:
         )
 
         # Initialise weights and intercepts
-        self._init_weights()
+        self.init_weights()
 
         # Initialise variables for recording progress during fit
         self.loss_curve = []
@@ -224,7 +224,7 @@ class FFNN:
 
                 self.activations[0] = X_batch
 
-                batch_loss = self._backprop(
+                batch_loss = self.backprop(
                     X_batch,
                     y_batch,
                 )
@@ -241,8 +241,6 @@ class FFNN:
                     )
 
             self.loss = tot_loss / X.shape[0]
-
-            print(self.loss)
 
             self.loss_curve.append(self.loss)
             if self.verbose:
@@ -281,32 +279,55 @@ class FFNN:
         self.fitted = True
         return self
 
-
     def predict(self, X):
-        if self.fitted:
-            self.activations[0] = X
-            self._feed_forward()
-
-            return self.activations[-1]
-        else:
+        """Predicts outputs of trained model from the samples 'X'"""
+        if not self.fitted:
             print("Model is not fitted.")
-            return 1
+            return -1
 
-    def score(self, X, y):
-        return self.r2_score(X, y)
+        self.activations[0] = X
+        self.feed_forward()
+
+        match self.model:
+            case "regression":
+                return self.activations[-1]
+            case "classification":
+                return np.array(y > .5, dtype=int)
 
     def r2_score(self, X, y):
+        """Measures the R2 score of regression model"""
+        
+        if not self.fitted:
+            print("Model is not fitted.")
+            return -1
+
         y_pred = self.predict(X)
 
         u = ((y - y_pred)**2).sum()
         v = ((y - y.mean()) ** 2).sum()
-
         return 1 - u/v
-    
-    def mse_score(self, X, y):
-        y_pred = self.predict(X)
 
+    def mse_score(self, X, y):
+        """Measures the mean squared error of regression model"""
+
+        if not self.fitted:
+            print("Model is not fitted.")
+            return -1
+
+        y_pred = self.predict(X)
         return ((y - y_pred)**2).mean()
+
+    def accuracy(self, X, y):
+        """Measures accuracy of classification model"""
+
+        if not self.fitted:
+            print("Model is not fitted.")
+            return -1
+
+        y_pred = self.predict(X)
+        n = y.shape[0]
+        return np.equal(y_pred, y).sum() / n
+
 
 
 def sigmoid(x):
@@ -333,12 +354,6 @@ def id(x):
 def id_deriv(x):
     return np.zeros(size=x.shape)
 
-def cost_ols(y, pred):
-    err = y - pred
-    return np.dot(err, err)/len(y)
-
-
-
 ACTIVATION = {
     "identity": id,
     "sigmoid": sigmoid,
@@ -353,7 +368,21 @@ DERIVATIVES = {
     "leaky_relu": leaky_relu_deriv
 }
 
+def cost_ols(y, y_pred):
+    return ((y - y_pred) ** 2).mean() / 2
 
+def log_loss(y_true, y_prob):
+    return (
+        -((y_true * np.log(y_prob)).sum() 
+            + ((1 - y_true) * np.log(1 - y_prob)).sum()
+        ) 
+        / y_prob.shape[0]
+    )
+
+COST = {
+    "least_squares": cost_ols,
+    "log_loss": log_loss
+}
 
 class MLPRegNormalInit(MLPRegressor):
     # Adopt MLPRegressor with normally distributed initial weights
@@ -412,7 +441,7 @@ class MLPRegNormalInit(MLPRegressor):
             max_fun=max_fun,
         )
     
-    def _init_coef(self, fan_in, fan_out, dtype):
+    def init_coef(self, fan_in, fan_out, dtype):
         # Changed probability distribution to normal (from uniform)
         factor = 6.0
         if self.activation == "logistic":

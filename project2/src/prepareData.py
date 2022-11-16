@@ -234,7 +234,7 @@ def generate_data(n, function, noise=False, mean_noise=0, std_noise=1):
             x = rng.random(size=(n,2))
             y = franke.franke(x[:,0], x[:,1]).reshape(-1, 1)
         case "polynomial":
-            x = rng.random(size=(n,1))
+            x = rng.uniform(-0.5, 1.2, size=(n,1))
             # coefs = rng.standard_normal(3)
             # y = coefs[0] * .1 * x + coefs[1] * x**2 + coefs[2] * x**3 + .02*rng.standard_normal((n,1))
             y = .1*x + x**2 - x**3 + .02*rng.standard_normal((n,1))
