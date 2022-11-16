@@ -6,14 +6,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
 import time 
-import os
-import pandas
 #matplotlib updates
 matplotlib.rcParams.update({'font.size': 16})
 plt.rcParams["font.family"] = "serif"
 from matplotlib.lines import Line2D
 from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,
                                AutoMinorLocator)
+
+import seaborn as sns
+
 #scikit
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -21,7 +22,7 @@ from sklearn.datasets import load_breast_cancer
 from sklearn import datasets
 from sklearn.utils import shuffle
 from sklearn.metrics import accuracy_score
-from sklearn.datasets import fetch_openml
+
 from sklearn.linear_model import LogisticRegression
 
 
@@ -29,10 +30,6 @@ from sklearn.linear_model import LogisticRegression
 from scipy.special import softmax
 
 #src
-import franke
-import dataFunctions
-import prepareData
-import sgd
 import logisticRegression
 #set seed for numpy random using time 
 #np.random.seed(seed=int(time.time())) 
@@ -80,7 +77,7 @@ def sklearn_test():
 
 sklearn_test()
 
-def logreg_confmat():
+def logreg_confmat(momentum):
     """
     Logistic regression to explore parameter space
     in learing rates and l2 penalties and
@@ -101,21 +98,22 @@ def logreg_confmat():
     X_test_scaled = scaler.transform(X_test)
 
     #Define test parameters
-    lambdas = np.logspace(-5, 0, 6)
-    learningRates = np.logspace(-6, -1, 6)
+    lambdas = np.logspace(-5, 1, 7)
+    lambda_labels = np.linspace(-5, 1, 7)
+    learningRates = np.logspace(-6, 0, 7)
+    lr_labels = np.linspace(-6,0, 7)
 
     #Set constants for run
     numMiniBatch = 128
-    numEpochs = 10
-    momentum = 0.7
-
+    numEpochs = 100
     #Storage container
     accuracies = np.zeros([len(learningRates), len(lambdas)])
-
+    accuracies_momentum = np.zeros([len(learningRates), len(lambdas)])
     #Initial regression weights
     startWeights = np.zeros(X_train.shape[1])
     startWeights = np.random.randn(X_train.shape[1])
     #Loop over learning rates and lambdas
+    #no momentum
     for i in range(len(learningRates)):
         for j in range(len(lambdas)):
             regWeights = logisticRegression.logisticRegression(
@@ -133,9 +131,25 @@ def logreg_confmat():
             prediction = logisticRegression.prediction(X_test_scaled, regWeights)
             classification = logisticRegression.classify(prediction)
             score = accuracy_score(y_test, classification)
-            accuracies[i, j] = score
-    
-    print(accuracies)
+            accuracies[i, j] = np.round(score, 2)
+   
+    fig, ax = plt.subplots()
+    sns.heatmap(accuracies, annot = True, cbar = True)
+    plt.xlabel(r'$\log_{10} \lambda$')
+    plt.ylabel(r'$\log_{10} \gamma$')
+    ax.set(xticklabels = np.round(lambda_labels, 0), yticklabels = np.round(lr_labels, 0))
+    ax.set_title(r'$\eta = $' +str(momentum))
+    #plt.savefig('logreg_mom.pdf', bbox_inches = 'tight')
+    plt.show()
+logreg_confmat(0.6)
 
-logreg_confmat()
+##################################
+#--------------------------------#
+#    Execute below functions     #
+#   to compute report figures   #
+#--------------------------------#
+##################################
 
+sklearn_test() #Print accuracies from sklearn method
+logreg_confmat(0.0) #accuracy matrix without momentum
+logreg_confmat(0.6) #accuracy matrix with momentum
