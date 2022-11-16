@@ -287,10 +287,11 @@ class FFNN:
 
         self.activations[0] = X
         self.feed_forward()
+        y = self.activations[-1]
 
         match self.model:
             case "regression":
-                return self.activations[-1]
+                return y
             case "classification":
                 return np.array(y > .5, dtype=int)
 
@@ -384,8 +385,30 @@ COST = {
     "log_loss": log_loss
 }
 
+
+def mlp_init_coef(self, fan_in, fan_out, dtype):
+    # Changed probability distribution to normal (from uniform)
+    factor = 6.0
+    if self.activation == "logistic":
+        factor = 2.0
+    init_bound = np.sqrt(factor / (fan_in + fan_out))
+    # Generate weights and bias:
+    coef_init = self._random_state.normal(
+        0., init_bound, (fan_in, fan_out)
+    )
+    # intercept_init = self._random_state.normal(0, init_bound, fan_out)
+    intercept_init = np.zeros(fan_out)
+    coef_init = coef_init.astype(dtype, copy=False)
+    intercept_init = intercept_init.astype(dtype, copy=False)
+    return coef_init, intercept_init
+
+# MLPRegressor._init_coef = mlp_init_coef
+
+
 class MLPRegNormalInit(MLPRegressor):
-    # Adopt MLPRegressor with normally distributed initial weights
+    """MLPRegressor from scikit-learn
+    Adopted to use normally distributed initial weights
+    """
 
     def __init__(
         self,
@@ -440,8 +463,8 @@ class MLPRegNormalInit(MLPRegressor):
             n_iter_no_change=n_iter_no_change,
             max_fun=max_fun,
         )
-    
-    def init_coef(self, fan_in, fan_out, dtype):
+
+    def _init_coef(self, fan_in, fan_out, dtype):
         # Changed probability distribution to normal (from uniform)
         factor = 6.0
         if self.activation == "logistic":

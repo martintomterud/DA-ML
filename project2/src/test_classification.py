@@ -1,6 +1,7 @@
+
 import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.model_selection import GridSearchCV
+from sklearn.datasets import load_breast_cancer
+from sklearn.neural_network import MLPClassifier
 
 import neuralNet
 import prepareData
@@ -8,12 +9,8 @@ import prepareData
 def main():
     rng = np.random.default_rng()
 
-    n = 1000
-    function = "polynomial"
-
-    noise = True
-    mean_noise = 0.
-    std_noise = .02
+    X, y = load_breast_cancer(return_X_y=True, as_frame=False)
+    x_tr, x_te, y_tr, y_te = prepareData.prepare_classification(X, y)
 
     layers = 5
     nodes = 10
@@ -25,20 +22,13 @@ def main():
     learning_rate = .5
     alpha = .001
     batch_size = 32
-    max_iter = 1000
+    max_iter = 200
     tol = 1e-4
     leak = .1
     init_scale = 10.
 
-    # param = {"alpha": np.concatenate((np.array([0.]), np.logspace(-10, 0, 11))), "learning_rate_init": np.linspace(.3, .5, 3)}
-    # param = {"alpha": [0], "learning_rate_init": np.linspace(.3, .8, 3)}
-    param = {"alpha": [0], "learning_rate_init": [.5]}
-
-    x, y = prepareData.generate_data(n, function, noise, mean_noise, std_noise)
-    x_tr, x_te, y_tr, y_te = prepareData.prepare_regression(x, y)
-
     homemade = neuralNet.FFNN(
-        model="regression",
+        model="classification",
         activation="sigmoid",
         weight_dist="normal",
         hidden_layers=hidden_layers,
@@ -50,11 +40,10 @@ def main():
         tol=tol,
         batch_size=batch_size,
         rng=rng,
-        n_iter_no_change=10,
         verbose=True
     )
 
-    skl_model = neuralNet.MLPRegNormalInit(
+    skl_model = MLPClassifier(
         hidden_layer_sizes=hidden_layers,
         activation="logistic",
         solver="sgd",                   # Alternatives: "sgd", "adam", "lbfgs"
@@ -67,23 +56,14 @@ def main():
         momentum=0.,                    # default: .9
     )
 
-    print(type(homemade))
-
     homemade.fit(x_tr, y_tr)
     skl_model.fit(x_tr, y_tr)
 
     y_pred = homemade.predict(x_te)
-    y_val = skl_model.predict(x_te)
 
-    fig, axs = plt. subplots(2, 1, figsize=(5,8))
-    axs[0].plot(x_te, y_te, '.')
-    axs[0].plot(x_te, y_pred, '.')
-    axs[1].plot(x_te, y_te, '.')
-    axs[1].plot(x_te, y_val, '.')
-    fig.savefig("test_ppnn.pdf")
+    print(homemade.accuracy(x_te, y_te))
 
-    print(homemade.r2_score(x_te, y_te))
-    print(homemade.mse_score(x_te, y_te))
+    print(skl_model.score(x_te, y_te))
 
     return 0
 

@@ -244,14 +244,27 @@ def generate_data(n, function, noise=False, mean_noise=0, std_noise=1):
     if noise:
         y += rng.normal(mean_noise, std_noise)
 
-    x_tr, x_te, y_tr, y_te = train_test_split(x, y, test_size=.1)
+    return x, y
+
+def prepare_regression(x, y):
+    x_tr, x_te, y_tr, y_te = train_test_split(x, y, test_size=.2)
 
     scale_x = StandardScaler().fit(x_tr)
     x_tr = scale_x.transform(x_tr)
     x_te = scale_x.transform(x_te)
 
     scale_y = StandardScaler().fit(y_tr)
-    y_tr = scale_y.transform(y_tr)  # .flatten()
-    y_te = scale_y.transform(y_te)  # .flatten()
+    y_tr = scale_y.transform(y_tr)
+    y_te = scale_y.transform(y_te)
+
+    return x_tr, x_te, y_tr, y_te
+
+def prepare_classification(x, y):
+    y = y.reshape(-1, 1)
+    x_tr, x_te, y_tr, y_te = train_test_split(x, y, test_size=.2)
+
+    scale_x = StandardScaler().fit(x_tr)
+    x_tr = scale_x.transform(x_tr)
+    x_te = scale_x.transform(x_te)
 
     return x_tr, x_te, y_tr, y_te
