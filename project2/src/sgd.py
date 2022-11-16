@@ -11,12 +11,12 @@ def SGD(x, y, startWeights, numBatches, numEpochs, learningRate, costFunction, *
     -------------------
     x :             ndarray - Design matrix
     y :             1d array - Response / Input vector of model
-    startWeights :       1d array - Start weights
+    startWeights :  1d array - Start weights
     numBatches :    int - Number of batches to split permuted arrays into
     numEpochs :     int - Number of epochs
     learningRate :  float - The learning rate
     costFunction :  function - pass to the fuction used to compute the gradient
-    *lamb :         float - optional of costFunctino requires lambda parameter
+    *lamb :         float - optional of costFunction requires lambda parameter
 
     Returns
     --------------------
