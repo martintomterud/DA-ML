@@ -227,6 +227,7 @@ def prepForSGD_Scale(N, scale, degree):
 
 
 def generate_data(n, function, noise=False, mean_noise=0, std_noise=1):
+    
     rng = np.random.default_rng()
 
     match function:
@@ -237,12 +238,13 @@ def generate_data(n, function, noise=False, mean_noise=0, std_noise=1):
             x = rng.uniform(-0.5, 1.2, size=(n,1))
             # coefs = rng.standard_normal(3)
             # y = coefs[0] * .1 * x + coefs[1] * x**2 + coefs[2] * x**3 + .02*rng.standard_normal((n,1))
-            y = .1*x + x**2 - x**3 + .02*rng.standard_normal((n,1))
+            # y = .1*x + x**2 - x**3 + .02*rng.standard_normal((n,1))
+            y = .1*x + x**2 - x**3
         case _:
             raise NameError("The available functions are \"franke\" and \"polynomial\".")
 
     if noise:
-        y += rng.normal(mean_noise, std_noise)
+        y += rng.normal(mean_noise, std_noise, size=y.shape)
 
     return x, y
 

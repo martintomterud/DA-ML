@@ -1,5 +1,6 @@
 
 import numpy as np
+import matplotlib.pyplot as plt
 from sklearn.datasets import load_breast_cancer
 from sklearn.neural_network import MLPClassifier
 
@@ -12,17 +13,17 @@ def main():
     X, y = load_breast_cancer(return_X_y=True, as_frame=False)
     x_tr, x_te, y_tr, y_te = prepareData.prepare_classification(X, y)
 
-    layers = 5
-    nodes = 10
+    layers = 1
+    nodes = 50
 
     hidden_layers = []
     for _ in range(layers):
         hidden_layers.append(nodes)
 
-    learning_rate = .5
-    alpha = .001
+    learning_rate = .7
+    alpha = 0.
     batch_size = 32
-    max_iter = 200
+    max_iter = 2000
     tol = 1e-4
     leak = .1
     init_scale = 10.
@@ -40,7 +41,6 @@ def main():
         tol=tol,
         batch_size=batch_size,
         rng=rng,
-        verbose=True
     )
 
     skl_model = MLPClassifier(
@@ -62,8 +62,11 @@ def main():
     y_pred = homemade.predict(x_te)
 
     print(homemade.accuracy(x_te, y_te))
-
     print(skl_model.score(x_te, y_te))
+
+    fig, ax = plt.subplots()
+    ax.plot(homemade.loss_curve)
+    fig.savefig("fig_H/class_curve.pdf")
 
     return 0
 
