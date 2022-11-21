@@ -11,18 +11,20 @@ class FFNN:
     def __init__(
         self,
         model="regression",
-        hidden_layers=[10,],
+        hidden_layers=[50,],
         activation="sigmoid",
         # solver="sgd",
         alpha=0.,
         leak=.01,
-        learning_rate=.5,
+        learning_rate=.6,
         max_iter=200,
         tol=1e-4,
         # momentum=0.,
-        batch_size=10,
-        weight_dist="normal",
-        init_scale=1.,
+        batch_size=32,
+        init_weight_dist="normal",
+        init_intercept_dist="constant",
+        init_weight_scale=10.,
+        init_intercept_scale=0.,
         rng=np.random.default_rng(),
         verbose=False,
         n_iter_no_change=10
@@ -38,10 +40,11 @@ class FFNN:
         self.tol = tol
         # self.momentum = momentum
         self.batch_size = batch_size
-        self.weight_dist = weight_dist
-        self.init_scale = init_scale
+        self.init_weight_dist = init_weight_dist
+        self.init_intercept_dist = init_intercept_dist
+        self.init_weight_scale = init_weight_scale
+        self.init_intercept_scale = init_intercept_scale
         self.rng = rng
-
 
         self.verbose = verbose
         self.n_iter_no_change = n_iter_no_change
@@ -72,19 +75,40 @@ class FFNN:
 
             # Scale as suggested by Glorot et. al. (2010) 
             # (see report for full citation)
-            scale = self.init_scale * np.sqrt(2./(dim_in + dim_out))
+            weight_scale = (self.init_weight_scale 
+                * np.sqrt(2./(dim_in + dim_out))
+            )
+            intercept_scale = self.init_intercept_scale
 
-            match self.weight_dist:
+            match self.init_weight_dist:
                 case "normal":
                     self.weights.append(
-                        self.rng.normal(0., scale, (dim_in, dim_out))
+                        self.rng.normal(0., weight_scale, (dim_in, dim_out))
                     )
                 case "uniform":
                     self.weights.append(
-                        self.rng.uniform(-scale, scale, (dim_in, dim_out))
+                        self.rng.uniform(
+                            -weight_scale, 
+                            weight_scale, 
+                            (dim_in, dim_out)
+                        )
                     )
 
-            self.intercepts.append(np.zeros(dim_out))
+            match self.init_intercept_dist:
+                case "normal":
+                    self.intercepts.append(
+                        self.rng.normal(0., intercept_scale, dim_out)
+                    )
+                case "uniform":
+                    self.intercepts.append(
+                        self.rng.uniform(
+                            -intercept_scale, 
+                            intercept_scale, 
+                            dim_out
+                        )
+                    )
+                case "constant":
+                    self.intercepts.append(intercept_scale * np.ones(dim_out))
 
     def feed_forward(self):
         hidden_act = ACTIVATION[self.activation]
@@ -110,8 +134,6 @@ class FFNN:
             self.activations[self.n_layers-1] = (
                 out_act(self.activations[self.n_layers-1])
             )
-
-        # return self.activations
 
     def backprop(self, X, y):
 
@@ -202,15 +224,16 @@ class FFNN:
 
         self.init_fit(X,y)
 
+        num_batches = self.n_samples//self.batch_size
+        if num_batches == 0:
+            num_batches = 1
+
         no_improvement_count = 0
 
         for it in range(self.max_iter):
             # Random permutation of indecies to avoid cycles
             sample_idx = self.rng.permutation(self.n_samples)
 
-            num_batches = self.n_samples//self.batch_size
-            if num_batches == 0:
-                num_batches = 1
 
             batches = np.array_split(
                 sample_idx, 
@@ -246,8 +269,7 @@ class FFNN:
             if self.verbose:
                 print("Iteration %d, loss = %.8f" % (it, self.loss))
 
-            # update no_improvement_count based on training loss or
-            # validation score according to early_stopping
+            # update no_improvement_count based on training loss
             if self.loss_curve[-1] > self.best_loss - self.tol:
                 no_improvement_count += 1
             else:
@@ -260,14 +282,13 @@ class FFNN:
                 # not better than last `n_iter_no_change` iterations by tol
                 # stop or decrease learning rate
                 msg = (
-                    "Training loss did not improve more than tol=%f"
-                    " for %d consecutive epochs."
-                    % (self.tol, self.n_iter_no_change)
+                    "Broke after epoch %d, with loss %f"
+                    % (it, self.loss_curve[-1])
                 )
                 print(msg)
                 break
 
-            if it == self.max_iter:
+            if it == self.max_iter-1:
                 msg = (
                     "Stochastic Optimizer: Maximum iterations (%d) "
                     "reached and the optimization hasn't converged yet. "
@@ -287,10 +308,11 @@ class FFNN:
 
         self.activations[0] = X
         self.feed_forward()
+        y = self.activations[-1]
 
         match self.model:
             case "regression":
-                return self.activations[-1]
+                return y
             case "classification":
                 return np.array(y > .5, dtype=int)
 
@@ -384,8 +406,30 @@ COST = {
     "log_loss": log_loss
 }
 
+
+def mlp_init_coef(self, fan_in, fan_out, dtype):
+    # Changed probability distribution to normal (from uniform)
+    factor = 6.0
+    if self.activation == "logistic":
+        factor = 2.0
+    init_bound = np.sqrt(factor / (fan_in + fan_out))
+    # Generate weights and bias:
+    coef_init = self._random_state.normal(
+        0., init_bound, (fan_in, fan_out)
+    )
+    # intercept_init = self._random_state.normal(0, init_bound, fan_out)
+    intercept_init = np.zeros(fan_out)
+    coef_init = coef_init.astype(dtype, copy=False)
+    intercept_init = intercept_init.astype(dtype, copy=False)
+    return coef_init, intercept_init
+
+# MLPRegressor._init_coef = mlp_init_coef
+
+
 class MLPRegNormalInit(MLPRegressor):
-    # Adopt MLPRegressor with normally distributed initial weights
+    """MLPRegressor from scikit-learn
+    Adopted to use normally distributed initial weights
+    """
 
     def __init__(
         self,
@@ -440,8 +484,8 @@ class MLPRegNormalInit(MLPRegressor):
             n_iter_no_change=n_iter_no_change,
             max_fun=max_fun,
         )
-    
-    def init_coef(self, fan_in, fan_out, dtype):
+
+    def _init_coef(self, fan_in, fan_out, dtype):
         # Changed probability distribution to normal (from uniform)
         factor = 6.0
         if self.activation == "logistic":

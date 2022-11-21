@@ -227,6 +227,7 @@ def prepForSGD_Scale(N, scale, degree):
 
 
 def generate_data(n, function, noise=False, mean_noise=0, std_noise=1):
+    
     rng = np.random.default_rng()
 
     match function:
@@ -237,21 +238,35 @@ def generate_data(n, function, noise=False, mean_noise=0, std_noise=1):
             x = rng.uniform(-0.5, 1.2, size=(n,1))
             # coefs = rng.standard_normal(3)
             # y = coefs[0] * .1 * x + coefs[1] * x**2 + coefs[2] * x**3 + .02*rng.standard_normal((n,1))
-            y = .1*x + x**2 - x**3 + .02*rng.standard_normal((n,1))
+            # y = .1*x + x**2 - x**3 + .02*rng.standard_normal((n,1))
+            y = .1*x + x**2 - x**3
         case _:
             raise NameError("The available functions are \"franke\" and \"polynomial\".")
 
     if noise:
-        y += rng.normal(mean_noise, std_noise)
+        y += rng.normal(mean_noise, std_noise, size=y.shape)
 
-    x_tr, x_te, y_tr, y_te = train_test_split(x, y, test_size=.1)
+    return x, y
+
+def prepare_regression(x, y):
+    x_tr, x_te, y_tr, y_te = train_test_split(x, y, test_size=.2)
 
     scale_x = StandardScaler().fit(x_tr)
     x_tr = scale_x.transform(x_tr)
     x_te = scale_x.transform(x_te)
 
     scale_y = StandardScaler().fit(y_tr)
-    y_tr = scale_y.transform(y_tr)  # .flatten()
-    y_te = scale_y.transform(y_te)  # .flatten()
+    y_tr = scale_y.transform(y_tr)
+    y_te = scale_y.transform(y_te)
+
+    return x_tr, x_te, y_tr, y_te
+
+def prepare_classification(x, y):
+    y = y.reshape(-1, 1)
+    x_tr, x_te, y_tr, y_te = train_test_split(x, y, test_size=.2)
+
+    scale_x = StandardScaler().fit(x_tr)
+    x_tr = scale_x.transform(x_tr)
+    x_te = scale_x.transform(x_te)
 
     return x_tr, x_te, y_tr, y_te
