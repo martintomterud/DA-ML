@@ -521,7 +521,7 @@ def tuneableRates(batchSize):
 ##################################
 #--------------------------------#
 #    Execute below functions     #
-#   to computed report figures   #
+#   to compute report figures   #
 #--------------------------------#
 ##################################
 
