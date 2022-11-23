@@ -6,8 +6,8 @@ This git folder contains multiple folders that together pose an answer the secon
 given at UiO Autumn 2022.
 The structure is as follows;
 
-- src: Contains all source code
-- figs: Figures included in the report
-- report: contains .tex and .pdf file of our report.
+- `src`: Contains all source code
+- `figures`: Figures included in the report
+- `report`: contains `.tex` and `.pdf` file of our report.
 
-- main.py: Calls the plotting functions in `src/`, which produces the plots
+- main.py: Calls the plotting functions in `src`, which produces the plots

@@ -186,7 +186,7 @@ def center_fData(fTrain, fTest):
 
 def scaleDesignMatrix(X_train, X_test):
     """
-    Uses scikit learns scale to scale teh design matrix and prep for 
+    Uses scikit learns scale to scale the design matrix and prep for 
     sgd minimization
     
     """
