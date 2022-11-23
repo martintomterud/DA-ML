@@ -10,4 +10,4 @@ The structure is as follows;
 - `figures`: Figures included in the report
 - `report`: contains `.tex` and `.pdf` file of our report.
 
-- main.py: Calls the plotting functions in `src`, which produces the plots
+- `main.py`: Calls the plotting functions in `src`, which produces the plots
