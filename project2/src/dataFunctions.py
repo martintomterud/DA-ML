@@ -3,10 +3,9 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import *
 from sklearn.utils import shuffle, resample
-import random 
-import designMatrix
-import regressionClass
 from imageio import imread
+
+from src import regressionClass
 
 
 def meshgrid(N):

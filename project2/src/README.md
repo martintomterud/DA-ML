@@ -18,13 +18,13 @@ The following files are written for project 2
 - prepareData.py contains code that loads data and preprocess it before it is used in the various methods
 - neuralNet.py is the main implementation of the neural network
 - test_ppnn.py contains code that runs tests of the nerual netowrk
-- test_classificationpy tests the neural network applied to the classification problem
+- test_classification.py tests the neural network applied to the classification problem
 
 
 ## Main files
 
 Code in the followig files can be executed to produce the results in our report
 
- - main_sgd.py for the gradient descent results
- - main_logreg.py for the logistic regression results
- - something.py for the neural network results
+ - plot_sgd.py for the gradient descent results
+ - plot_logreg.py for the logistic regression results
+ - plot_nn.py and plot_nn_classifier.py for the neural network results

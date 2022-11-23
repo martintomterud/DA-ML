@@ -5,7 +5,7 @@ from sklearn.preprocessing import StandardScaler
 
 
 # import dataFunctions
-import franke
+from src import franke
 
 ##########################################
 #  These functions create data, scales,  #

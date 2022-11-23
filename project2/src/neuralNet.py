@@ -277,16 +277,16 @@ class FFNN:
             if self.loss_curve[-1] < self.best_loss:
                 self.best_loss = self.loss_curve[-1]
 
-
-            if no_improvement_count > self.n_iter_no_change:
-                # not better than last `n_iter_no_change` iterations by tol
-                # stop or decrease learning rate
-                msg = (
-                    "Broke after epoch %d, with loss %f"
-                    % (it, self.loss_curve[-1])
-                )
-                print(msg)
-                break
+            # The following lines are commented out for plotting purposes
+            # if no_improvement_count > self.n_iter_no_change:
+            #     # not better than last `n_iter_no_change` iterations by tol
+            #     # stop or decrease learning rate
+            #     msg = (
+            #         "Broke after epoch %d, with loss %f"
+            #         % (it, self.loss_curve[-1])
+            #     )
+            #     print(msg)
+            #     break
 
             if it == self.max_iter-1:
                 msg = (
