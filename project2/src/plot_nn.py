@@ -4,18 +4,11 @@ import matplotlib
 
 matplotlib.rcParams.update({'font.size': 16})
 plt.rcParams["font.family"] = "serif"
-from matplotlib.lines import Line2D
-from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,
-                               AutoMinorLocator)
 
-import prepareData
-import neuralNet
-
-def main():
-    plot_lr()
-    return 0
+from src import prepareData, neuralNet
 
 def plot_lr():
+    # Average the results over multiple runs, set by this variable
     num_avg = 5
 
     # Set parameters for test data
@@ -79,56 +72,39 @@ def plot_lr():
         mse_test_lin[i] = mse/num_avg
 
 
-    fig, ax = plt.subplots()
-    for i in range(l_log):
-        ax.plot(np.log10(mse_curve_log[i]), 
-            label=r"\gamma = {0:1.1e}".format(lr_log[i])
-        )
+    # fig, ax = plt.subplots()
+    # for i in range(l_log):
+    #     ax.plot(np.log10(mse_curve_log[i]), 
+    #         label=r"\gamma = {0:1.1e}".format(lr_log[i])
+    #     )
 
-    fig.legend()
-    fig.savefig("fig_H/lr_curve_log.pdf")
+    # fig.legend()
+    # fig.savefig("fig_H/lr_curve_log.pdf")
 
-    fig2, ax2 = plt.subplots()
-    
-    ax2.plot(np.log10(lr_log), mse_test_log)
-    fig2.savefig("fig_H/lr_mse_log.pdf")
+    # fig2, ax2 = plt.subplots()
 
-    fig, ax = plt.subplots()
-    for i in range(l_lin):
-        ax.plot(np.log10(mse_curve_lin[i]), 
-            label=r"\gamma = {0:1.1f}".format(lr_lin[i])
-        )
+    # ax2.plot(np.log10(lr_log), mse_test_log)
+    # fig2.savefig("fig_H/lr_mse_log.pdf")
 
-    fig.legend()
-    fig.savefig("fig_H/lr_curve_lin.pdf")
+    # fig, ax = plt.subplots()
+    # for i in range(l_lin):
+    #     ax.plot(np.log10(mse_curve_lin[i]), 
+    #         label=r"\gamma = {0:1.1f}".format(lr_lin[i])
+    #     )
 
-    fig2, ax2 = plt.subplots()
-    
-    ax2.plot(lr_lin, mse_test_lin)
-    fig2.savefig("fig_H/lr_mse_lin.pdf")
+    # fig.legend()
+    # fig.savefig("fig_H/lr_curve_lin.pdf")
 
+    # fig2, ax2 = plt.subplots()
 
+    # ax2.plot(lr_lin, mse_test_lin)
+    # fig2.savefig("fig_H/lr_mse_lin.pdf")
 
 
     fig, ax  = plt.subplots(1, 2)
     fig.tight_layout()
-    # #Ticks
-    # #ax1.yaxis.set_major_locator(MultipleLocator(2000))
-    # #ax1.yaxis.set_minor_locator(MultipleLocator(1000))
-    # ax[0].xaxis.set_major_locator(MultipleLocator(1000))
-    # ax[1].xaxis.set_major_locator(MultipleLocator(1000))
-    # ax[0].xaxis.set_minor_locator(MultipleLocator(500))
-    # ax[1].xaxis.set_minor_locator(MultipleLocator(500))
-    # #ax[0].yaxis.set_major_locator(MultipleLocator(0.01))
-    # #ax[1].yaxis.set_major_locator(MultipleLocator(0.1))
-    # for a in ax:
-    #     a.tick_params(axis='x', which='minor', top=True, direction = 'in', length = 5)
-    #     a.tick_params(axis='x', top=True, direction = 'in', length = 10)
-    #     a.tick_params(axis='y', which='minor', right=True, direction = 'in', length = 5)
-    #     a.tick_params(axis='y', right=True, direction = 'in', length = 10)
     ax[0].set_ylabel('MSE')
     ax[0].set_xlabel('Epoch')
-    # ax[1].set_ylabel('MSE')
     ax[1].set_xlabel('Epoch')
 
     x_axis = np.arange(1, max_iter)
@@ -141,8 +117,7 @@ def plot_lr():
         ax[1].semilogy(x_axis, mse_curve_lin[i], color = colors[i], label = r'$\gamma = {0:1.2f}$'.format(lr_lin[i])) 
 
     ax[1].legend(fontsize=12)
-    fig.savefig('fig_H/lr_test.pdf', bbox_inches = 'tight')
+    fig.savefig("figures/lr_nn.pdf", bbox_inches = 'tight')
 
     return 0
 
-main()

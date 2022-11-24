@@ -19,10 +19,10 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LinearRegression #for comparisson
 
 #src
-import franke
-import dataFunctions
-import prepareData
-import sgd
+from src import dataFunctions, prepareData, sgd
+# import dataFunctions
+# import prepareData
+# import sgd
 #set seed for numpy random using time 
 #np.random.seed(seed=int(time.time())) 
 #set const seed for debugging
@@ -163,7 +163,7 @@ def sgd_main(batchSize):
     for a in ax:
         a.axhline(y = mse_sklearn, color = 'k', label = 'sklearn OLS')
     ax[0].legend(fontsize = 12)
-    plt.savefig('sgd_1.pdf', bbox_inches = 'tight')
+    plt.savefig("figures/sgd_1.pdf", bbox_inches = 'tight')
     # plt.show()
 
 def sgd_ridge(batchSize):
@@ -261,8 +261,8 @@ def sgd_ridge(batchSize):
     for a in ax:
         a.axhline(y = mse_sklearn, color = 'k', label = 'sklearn OLS')
     ax[0].legend(fontsize = 12)
-    #plt.savefig('sgd_ridge_1.pdf', bbox_inches = 'tight')
-    plt.show()
+    plt.savefig("figures/sgd_ridge_1.pdf", bbox_inches = 'tight')
+    # plt.show()
 
 def adaptiveGradient(batchSize):
     """
@@ -388,8 +388,8 @@ def adaptiveGradient(batchSize):
     for a in ax:
         a.axhline(y = mse_sklearn, color = 'k', label = 'sklearn OLS')
     ax[0].legend(fontsize = 12, loc = 7)
-    plt.savefig('adagrad_1.pdf', bbox_inches = 'tight')
-    plt.show()
+    plt.savefig("figures/adagrad_1.pdf", bbox_inches = 'tight')
+    # plt.show()
 
 def tuneableRates(batchSize):
     """
@@ -512,8 +512,8 @@ def tuneableRates(batchSize):
     for a in ax:
         a.axhline(y = mse_sklearn, color = 'k', label = 'sklearn OLS')
     ax[0].legend(fontsize = 12, loc = 7)
-    #plt.savefig('tunerates_1.pdf', bbox_inches = 'tight')
-    plt.show()
+    plt.savefig("figures/tunerates_1.pdf", bbox_inches = 'tight')
+    # plt.show()
 
 
 
@@ -526,8 +526,8 @@ def tuneableRates(batchSize):
 ##################################
 
 
-sgd_main(64)
-sgd_main(128)
-sgd_ridge(64)
-adaptiveGradient(128)
-tuneableRates(128)
+# sgd_main(64)
+# sgd_main(128)
+# sgd_ridge(64)
+# adaptiveGradient(128)
+# tuneableRates(128)
