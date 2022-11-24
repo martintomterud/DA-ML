@@ -60,7 +60,7 @@ def forwardEuler(dx, T, L = 1, D = 1.0):
 
     # 5. Loop through timesteps and update u
 
-    for i in range(1, Nt):
+    for i in range(1, Nt+1):
 
         #Update u according to theory, excluding 0 endpoints
         u[i, 1:Nx] = u[i - 1, 1:Nx] + dt / (dx)**2 *( u[i - 1, 0:Nx-1] -2*u[i - 1, 1:Nx] + u[i - 1, 2:Nx+1])
