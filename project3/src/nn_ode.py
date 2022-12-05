@@ -1,22 +1,26 @@
-import tensorflow as tf
-import tensorflow.experimental.numpy as tnp
 import matplotlib.pyplot as plt
+import numpy as np
 
+import tensorflow as tf
+from tensorflow.experimental import numpy as tnp
+from tensorflow.keras.initializers import GlorotNormal, RandomNormal
 
 class ODEModel(tf.keras.Model):
+    # Keras model with custom training step
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Track loss during training
         self.loss_tracker = tf.keras.metrics.Mean(name="loss")
-        # self.mae_metric = tf.keras.metrics.MeanAbsoluteError(name="mae")
 
     def train_step(self, x):
         with tf.GradientTape(persistent=True) as tape:
             tape.watch(x)
-            u_pred = self(x, training=True)  # Forward pass
-            # Compute our own loss
-            du_dx = tape.gradient(u_pred, x)
-            # print(type(du_dx))
-            loss = ode_loss(u_pred, du_dx)
+            # Forward pass
+            func = self(x, training=True)
+            # Compute derivative of 'func'
+            df_dx = tape.gradient(func, x)
+            # Compute costum loss
+            loss = ode_loss(func, df_dx)
 
         # Compute gradients
         trainable_vars = self.trainable_variables
@@ -27,42 +31,49 @@ class ODEModel(tf.keras.Model):
 
         # Compute our own metrics
         self.loss_tracker.update_state(loss)
-        # self.mae_metric.update_state(y, y_pred)
+
         return {"loss": self.loss_tracker.result()}
 
     @property
     def metrics(self):
-        # We list our `Metric` objects here so that `reset_states()` can be
-        # called automatically at the start of each epoch
-        # or at the start of `evaluate()`.
-        # If you don't implement this property, you have to call
-        # `reset_states()` yourself at the time of your choosing.
+        # List of `Metric` objects
         return [self.loss_tracker]
 
 
-class FunctionLayer(tf.keras.layers.Layer):
+def create_model(hidden_layers=[10,], u_0=10., initializer=GlorotNormal()):
+    x = tf.keras.Input(shape=(1))
+    nn = x
+
+    for n in hidden_layers:
+        nn = tf.keras.layers.Dense(
+            units=n,
+            activation=tf.keras.activations.sigmoid,
+            kernel_initializer=initializer,
+            bias_initializer=initializer
+        )(nn)
+
+    nn = tf.keras.layers.Dense(
+        units=1,
+        kernel_initializer=initializer,
+        bias_regularizer=initializer
+    )(nn)
+
+    u = ConditionLayer(x, u_0)(nn)
+
+    return ODEModel(inputs=x, outputs=u)
+
+
+
+class ConditionLayer(tf.keras.layers.Layer):
+    # Layer which forces initial conditions on the network
     def __init__(self, x, u_0=0.):
-        super(FunctionLayer, self).__init__()
+        super(ConditionLayer, self).__init__()
         self.x = x
         self.u_0 = u_0
 
     def __call__(self, nn):
+        # Function defining the initial conditions
         return self.u_0 + self.x * nn
-
-
-
-def create_model(u_0=10.):
-    x = tf.keras.Input(shape=(1))
-
-    nn = tf.keras.layers.Dense(10, activation=tf.keras.activations.sigmoid)(x)
-    nn = tf.keras.layers.Dense(1, activation=tf.keras.activations.sigmoid)(nn)
-
-    # h2 = tf.keras.layers.Multiply()([x, nn])
-
-    # u = tf.keras.layers.Lambda(lambda x: u_0 + x)(h2)
-    u = FunctionLayer(x, u_0)(nn)
-
-    return ODEModel(inputs=x, outputs=u)
 
 
 def ode_loss(u, du_dx):
@@ -75,26 +86,36 @@ def u_analytic(x, u_0=10., gamma=2.):
     return u_0 * tnp.exp(-gamma * x)
 
 
-def main():
-    optimizer = tf.keras.optimizers.SGD(learning_rate=0.01)
+def func1(u_0):
+    return lambda x: u_0
 
-    model = create_model()
-    # We don't passs a loss or metrics here.
+def func2():
+    return lambda x: x
+
+def main():
+    rng = np.random.default_rng()
+
+    optimizer = tf.keras.optimizers.SGD(learning_rate=1e-3)
+
+    u_0 = 10.
+    hidden_layers = [10, 5]
+
+    model = create_model(u_0=u_0)
     model.compile(optimizer=optimizer)
 
-    # Just use `fit` as usual -- you can use callbacks, etc.
-    N = 50
-    x = tnp.linspace(0, 1., N, dtype="float32")
+    N = 10
+    x_train = rng.random((N, 1), dtype="float32")
 
-    model.fit(x, epochs=1000)
+    model.fit(x_train, epochs=2000)
 
-    u_pred = model.predict(x)
+    x_test = rng.random((100, 1), dtype="float32")
+    u_pred = model.predict(x_test)
 
-    u_anal = u_analytic(x)
+    u_anal = u_analytic(x_test, u_0)
 
     fig, ax = plt.subplots()
-    ax.plot(x,u_pred)
-    ax.plot(x,u_anal)
+    ax.plot(x_test, u_pred, '.')
+    ax.plot(x_test, u_anal, '.')
     fig.savefig("second.pdf")
 
 
