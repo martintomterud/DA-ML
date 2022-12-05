@@ -10,7 +10,8 @@ from ode_model import ODEModel, ConditionLayer
 def create_model(
     func, 
     hidden_layers=[10,], 
-    initializer=tf.keras.initializers.GlorotNormal()
+    activation=tf.keras.activations.sigmoid,
+    initializer=tf.keras.initializers.GlorotNormal(seed=42)
 ):
     x = tf.keras.Input(shape=(1))
     nn = x
@@ -18,7 +19,7 @@ def create_model(
     for n in hidden_layers:
         nn = tf.keras.layers.Dense(
             units=n,
-            activation=tf.keras.activations.sigmoid,
+            activation=activation,
             kernel_initializer=initializer,
             bias_initializer=initializer
         )(nn)
@@ -54,17 +55,26 @@ def main():
 
     # Settings for neural network
     hidden_layers = [10,]
+    activation = tf.keras.activations.sigmoid
     initializer = tf.keras.initializers.GlorotNormal(seed=42)
 
-    optimizer = tf.keras.optimizers.SGD(learning_rate=1e-3)
+    optimizer = tf.keras.optimizers.SGD(learning_rate=5e-2, momentum=.4)
+    # optimizer = tf.keras.optimizers.Adam(learning_rate=6e-1)
 
-    model = create_model(initial_condition, initializer=initializer)
+    epochs = 300
+
+    model = create_model(
+        func=initial_condition,
+        activation=activation,
+        initializer=initializer
+    )
     model.compile(optimizer=optimizer)
 
     N = 10
+    # x_train = np.linspace(0., 1., N).reshape((N, 1))
     x_train = rng.random((N, 1), dtype="float32")
 
-    model.fit(x_train, epochs=2000)
+    model.fit(x_train, epochs=epochs)
 
     x_test = rng.random((100, 1), dtype="float32")
     u_pred = model.predict(x_test)
