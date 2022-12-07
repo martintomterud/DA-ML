@@ -1,5 +1,6 @@
 import tensorflow as tf
 from tensorflow import GradientTape
+import numpy as np
 
 ####################
 #
@@ -8,14 +9,41 @@ from tensorflow import GradientTape
 #   so we can implement MSE between du_d2x and du_dt
 #    as well as including a t tensor where only x tensor was before
 
+def prepare_arrays(grid_size, L, T):
+    """
+    Creates x and t arrays in ranges
+    x in [0, L]
+    t in [0, T]
+    with grid_size random points
+    """
+    x = np.linspace(0, L, grid_size)
+    t = np.linspace(0, T, grid_size)
+    return x, t 
+
+def prepare_arrays_random(grid_size, L, T):
+    """
+    Creates x and t arrays in ranges
+    x in [0, L]
+    t in [0, T]
+    with grid_size random points
+    """
+    x = np.random.ranf(0, L, grid_size)
+    t = np.random.ranf(0, T, grid_size)
+    # Make sure to include endpoints
+    x[0] = 0
+    x[-1] = L
+    t[0] = 0
+    t[-1] = T
+    return x, t 
 
 class PDEModel(tf.keras.Model):
     # Keras model with custom training step
     def __init__(self, loss, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.ode_loss = loss
+        self.pde_loss = loss
         # Track loss during training
         self.loss_tracker = tf.keras.metrics.Mean(name="loss")
+
 
     def train_step(self, x, t):
         with GradientTape(persistent=True) as tape:
@@ -25,9 +53,9 @@ class PDEModel(tf.keras.Model):
             # Compute derivative of 'func'
             du_dx = tape.gradient(func, x)
             du_d2x = tape.gradient(du_dx, x)
-            du_dt = tape.gradient(du_dt, x)
+            du_dt = tape.gradient(func, t)
             # Compute costum loss
-            loss = self.ode_loss(func, du_d2x, du_dt)
+            loss = self.pde_loss(du_d2x, du_dt)
 
         # Compute gradients
         trainable_vars = self.trainable_variables
