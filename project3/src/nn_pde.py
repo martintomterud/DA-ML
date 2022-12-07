@@ -56,13 +56,11 @@ def main():
 
     # Settings for neural network
     hidden_layers = [10,]
-    activation = tf.keras.activations.sigmoid
+    activation = tf.keras.activations.tanh
     initializer = tf.keras.initializers.GlorotNormal(seed=42)
 
-    optimizer = tf.keras.optimizers.SGD(learning_rate=5e-5)
+    optimizer = tf.keras.optimizers.SGD(learning_rate=1e-2)
     # optimizer = tf.keras.optimizers.Adam(learning_rate=6e-1)
-
-    epochs = 300
 
     model = create_model(
         func=initial_condition,
@@ -72,10 +70,11 @@ def main():
     )
     model.compile(optimizer=optimizer)
 
-    N_train = 100
+    N_train = 300
     N_test = 100
+    epochs = 1000
+
     T = .5
-    # x_train = np.linspace(0., 1., N_x).reshape((N_x, 1))
     x_train = rng.random((N_train, 1), dtype="float32")
     t_train = T * rng.random((N_train, 1), dtype="float32")
 
@@ -94,7 +93,7 @@ def main():
 
     fig2, ax2 = plt.subplots()
     ax2.scatter(x_test, t_test, c=f_anal, cmap="Reds")
-    fig.savefig("scatter_analytic.pdf")
+    fig2.savefig("scatter_analytic.pdf")
 
 
 main()
