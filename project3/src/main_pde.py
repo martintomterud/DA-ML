@@ -72,7 +72,7 @@ def part_b():
     axs1.set_ylabel(r'$t$')
     cbar = fig1.colorbar(pan1, ax=axs1)
     cbar.set_label(r'$u(x, t)$')
-    plt.savefig('u10.pdf', bbox_inches='tight')
+    plt.savefig('num_u10.pdf', bbox_inches='tight')
 
     fig2, axs2 = plt.subplots(1, 2, figsize=(12,8))
     pan2 = axs2[0].pcolormesh(X_1, T_1, sqr_error_1, cmap='gist_ncar', rasterized=True)
@@ -89,7 +89,7 @@ def part_b():
     axs2[1].tick_params(axis='x', top=True, direction='in', length=10)
     axs2[1].tick_params(axis='y', which='minor', right=True, direction='in', length=5)
     axs2[1].tick_params(axis='y', right=True, direction='in', length=10)
-    plt.savefig('err10.pdf', bbox_inches='tight')
+    plt.savefig('num_err10.pdf', bbox_inches='tight')
 
     fig3, axs3 = plt.subplots(figsize=(8,8))
     pan3 = axs3.pcolormesh(X_2, T_2, u_2, cmap='Reds', rasterized=True)
@@ -97,7 +97,7 @@ def part_b():
     axs3.set_ylabel(r'$t$')
     cbar = fig3.colorbar(pan3, ax=axs3)
     cbar.set_label(r'$u(x, t)$')
-    plt.savefig('u100.pdf', bbox_inches='tight')
+    plt.savefig('num_u100.pdf', bbox_inches='tight')
 
     fig4, axs4 = plt.subplots(1, 2, figsize=(12,8))
     pan4 = axs4[0].pcolormesh(X_2, T_2, sqr_error_2, cmap='binary', rasterized=True)
@@ -114,7 +114,7 @@ def part_b():
     axs4[1].tick_params(axis='x', top=True, direction='in', length=10)
     axs4[1].tick_params(axis='y', which='minor', right=True, direction='in', length=5)
     axs4[1].tick_params(axis='y', right=True, direction='in', length=10)
-    plt.savefig('err100.pdf', bbox_inches='tight')
+    plt.savefig('num_err100.pdf', bbox_inches='tight')
 
     # Plots of relative error
     fig5, axs5 = plt.subplots(1, 2, figsize=(12,8))
@@ -132,6 +132,7 @@ def part_b():
     axs5[1].tick_params(axis='x', top=True, direction='in', length=10)
     axs5[1].tick_params(axis='y', which='minor', right=True, direction='in', length=5)
     axs5[1].tick_params(axis='y', right=True, direction='in', length=10)
+    fig5.savefig("num_rel_err10")
 
     fig6, axs6 = plt.subplots(1, 2, figsize=(12,8))
     pan6 = axs6[0].pcolormesh(X_2[:,1:-1], T_2[:,1:-1], rel_err_2, cmap='Greys', rasterized=True)
@@ -148,10 +149,8 @@ def part_b():
     axs6[1].tick_params(axis='x', top=True, direction='in', length=10)
     axs6[1].tick_params(axis='y', which='minor', right=True, direction='in', length=5)
     axs6[1].tick_params(axis='y', right=True, direction='in', length=10)
-    fig6.savefig("test_size.pdf")
+    fig6.savefig("num_rel_err100.pdf")
 
-
-    # plt.show()
-
+    return 0
 
 part_b()

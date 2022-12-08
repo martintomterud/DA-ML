@@ -5,6 +5,7 @@ import tensorflow as tf
 from tensorflow.experimental import numpy as tnp
 
 from pde_model_hm import PDEModel, ConditionLayer
+import pde_solver
 
 
 def create_model(
@@ -59,7 +60,8 @@ def main():
     activation = tf.keras.activations.tanh
     initializer = tf.keras.initializers.GlorotNormal(seed=42)
 
-    optimizer = tf.keras.optimizers.SGD(learning_rate=1e-2)
+    # optimizer = tf.keras.optimizers.SGD(learning_rate=1e-2)
+    optimizer = tf.keras.optimizers.SGD(learning_rate=1e-2, momentum=.8)
     # optimizer = tf.keras.optimizers.Adam(learning_rate=6e-1)
 
     model = create_model(
@@ -70,9 +72,9 @@ def main():
     )
     model.compile(optimizer=optimizer)
 
-    N_train = 300
+    N_train = 200
     N_test = 100
-    epochs = 1000
+    epochs = 400
 
     T = .5
     x_train = rng.random((N_train, 1), dtype="float32")
@@ -87,13 +89,29 @@ def main():
 
     f_anal = f_analytic(x_test, t_test)
 
+    sqr_err = pde_solver.sqr_err(f_pred, f_anal)
+    rel_err = pde_solver.rel_err(f_pred, f_anal)
+
     fig, ax = plt.subplots()
-    ax.scatter(x_test, t_test, c=f_pred, cmap="Reds")
-    fig.savefig("scatter_pde.pdf")
+    im = ax.scatter(x_test, t_test, c=f_pred, cmap="Reds")
+    fig.colorbar(im, ax=ax)
+    fig.savefig("nn_pred.pdf")
 
-    fig2, ax2 = plt.subplots()
-    ax2.scatter(x_test, t_test, c=f_anal, cmap="Reds")
-    fig2.savefig("scatter_analytic.pdf")
+    # fig2, ax2 = plt.subplots()
+    # im2 = ax2.scatter(x_test, t_test, c=f_anal, cmap="Reds")
+    # fig2.colorbar(im2, ax=ax2)
+    # fig2.savefig("nn_analytic.pdf")
 
+    fig, ax = plt.subplots()
+    im = ax.scatter(x_test, t_test, c=sqr_err, cmap="Reds")
+    fig.colorbar(im, ax=ax)
+    fig.savefig("nn_sqr_err.pdf")
+
+    fig, ax = plt.subplots()
+    im = ax.scatter(x_test, t_test, c=rel_err, cmap="Reds")
+    fig.colorbar(im, ax=ax)
+    fig.savefig("nn_rel_err.pdf")
+
+    return 0
 
 main()
