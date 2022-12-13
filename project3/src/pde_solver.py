@@ -1,21 +1,16 @@
-import numpy as np 
-import matplotlib.pyplot as plt
+"""Methods to solve a PDE numerically"""
+import numpy as np
 
-def initialCondition(x, L=1.):
-    """
-    Returns the initial condition at x
-    """
+def initial_condition(x, L=1.):
+    """Returns the initial condition at x"""
     return np.sin((np.pi * x / L))
 
-def analyticalSolution(x, t):
-    """
-    Returns analytical solution of diffusion equation
-    """
+def analytical_solution(x, t):
+    """Returns analytical solution of diffusion equation"""
     return np.sin(np.pi * x) * np.exp(-np.pi**2 * t)
 
-def forwardEuler(dx, T, L = 1., D = 1.):
-    """
-    Solves the diffusion equation
+def forward_euler(dx, T, L=1., D=1.):
+    """Solves the diffusion equation
 
         u_t = D u_xx
 
@@ -33,13 +28,11 @@ def forwardEuler(dx, T, L = 1., D = 1.):
 
     Returns
     --------------------
-
     u : matrix          - The solution of the diffusion eq at all timestep
     x : array           - x-axis
     t : array           - t-axis
     """
-
-    # 1. Set up x array. 
+    # 1. Set up x array.
     Nx = int(L/dx)         # Number of points determined by length and spacing
     print(L, dx, Nx)
     x = np.linspace(0., L, Nx + 1)
@@ -57,7 +50,7 @@ def forwardEuler(dx, T, L = 1., D = 1.):
     u = np.zeros((len(t), len(x)))
 
     # 4. Set u_1 to intial cond. and ensure boundary cond. is met
-    u[0, :] = initialCondition(x)
+    u[0, :] = initial_condition(x)
     # u[0, 0] = 0.
     # u[0, Nx] = 0.
 

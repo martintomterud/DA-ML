@@ -1,18 +1,18 @@
+"""Solves an ODE with the use of a neural network"""
 import matplotlib.pyplot as plt
 import numpy as np
-
 import tensorflow as tf
-from tensorflow.experimental import numpy as tnp
 
 from ode_model import ODEModel, ConditionLayer
 
 
 def create_model(
-    func, 
-    hidden_layers=[10,], 
+    func,
+    hidden_layers=[10,],
     activation=tf.keras.activations.sigmoid,
     initializer=tf.keras.initializers.GlorotNormal(seed=42)
 ):
+    """Creates neural network model for solving an ODE"""
     x = tf.keras.Input(shape=(1))
     nn = x
 
@@ -36,21 +36,23 @@ def create_model(
 
 #  The following three functions describe the ODE to be solved
 def ode_loss(f, df_dx):
-    # ODE to be minimized
+    """Computes loss to be minimised."""
     eq = df_dx + 2. * f
     return tf.math.reduce_mean(tf.math.square(eq))
 
 def initial_condition(x, neural_network):
-    # This functions wraps the neural network and makes it consistent with the
-    # initial conditions
+    """This functions wraps the neural network and makes it consistent with the
+    initial conditions
+    """
     return 10. + x * neural_network
 
 def u_analytic(x, u_0=10., gamma=2.):
-    # Gives the analytic solution to the ODE for comparison
-    return u_0 * tnp.exp(-gamma * x)
+    """Gives the analytic solution to the ODE for comparison"""
+    return u_0 * np.exp(-gamma * x)
 
 
 def main():
+    """Testing the neural network"""
     rng = np.random.default_rng()
 
     # Settings for neural network
@@ -64,6 +66,7 @@ def main():
     epochs = 300
 
     model = create_model(
+        hidden_layers=hidden_layers,
         func=initial_condition,
         activation=activation,
         initializer=initializer
@@ -84,7 +87,7 @@ def main():
     fig, ax = plt.subplots()
     ax.plot(x_test, u_pred, '.')
     ax.plot(x_test, u_anal, '.')
-    fig.savefig("second.pdf")
+    fig.savefig("nn_ode.pdf")
 
 
 main()

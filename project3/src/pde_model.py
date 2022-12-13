@@ -18,7 +18,7 @@ def prepare_arrays(grid_size, L, T):
     """
     x = np.linspace(0, L, grid_size)
     t = np.linspace(0, T, grid_size)
-    return x, t 
+    return x, t
 
 def prepare_arrays_random(grid_size, L, T):
     """
@@ -34,10 +34,10 @@ def prepare_arrays_random(grid_size, L, T):
     x[-1] = L
     t[0] = 0
     t[-1] = T
-    return x, t 
+    return x, t
 
 class PDEModel(tf.keras.Model):
-    # Keras model with custom training step
+    """Keras model with custom training step"""
     def __init__(self, loss, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.pde_loss = loss
@@ -76,7 +76,7 @@ class PDEModel(tf.keras.Model):
 
 
 class ConditionLayer(tf.keras.layers.Layer):
-    # Layer which forces initial conditions on the network
+    """Layer which forces initial conditions on the network"""
     def __init__(self, x, t, func):
         super(ConditionLayer, self).__init__()
         self.x = x

@@ -1,24 +1,26 @@
+"""Solves a PDE with the use of a neural network"""
 import matplotlib.pyplot as plt
 import numpy as np
-
 import tensorflow as tf
-from tensorflow.experimental import numpy as tnp
 
-from pde_model_hm import PDEModel, ConditionLayer
 import pde_solver
+from pde_model_hm import ConditionLayer, PDEModel
 
 
 def create_model(
-    func, 
-    hidden_layers=[10,], 
+    initial_conditions,
+    hidden_layers=[10,],
     activation=tf.keras.activations.sigmoid,
     initializer=tf.keras.initializers.GlorotNormal(seed=42)
 ):
+    """Creates neural network model to solve PDE
+
+    Returns:
+        A PDEModel object, which inherits from keras.Model
+    """
     x = tf.keras.Input(shape=(1))
     t = tf.keras.Input(shape=(1))
-
     nn = tf.keras.layers.concatenate([x, t])
-
     for n in hidden_layers:
         nn = tf.keras.layers.Dense(
             units=n,
@@ -33,26 +35,28 @@ def create_model(
         bias_regularizer=initializer
     )(nn)
 
-    f = ConditionLayer(x, t, func)(nn)
+    f = ConditionLayer(x, t, initial_conditions)(nn)
 
     return PDEModel(ode_loss, inputs=[x, t], outputs=f)
 
-#  The following three functions describe the ODE to be solved
 def ode_loss(df_t, d2f_x):
-    # ODE to be minimized
+    """Computes loss to be minimised by network
+
+    The differential equation to be solved is described by 'eq'
+    """
     eq = d2f_x - df_t
     return tf.math.reduce_mean(tf.math.square(eq))
 
 def initial_condition(x, t, neural_network):
-    # This functions wraps the neural network and makes it consistent with the
-    # initial conditions
-    return tf.sin(tnp.pi * x) * (1 + t * neural_network)
+    """Restricts output of network to initial conditions"""
+    return tf.sin(np.pi * x) * (1 + t * neural_network)
 
 def f_analytic(x, t):
-#     # Gives the analytic solution to the ODE for comparison
+    """Gives the analytic solution of the PDE for testing"""
     return np.sin(np.pi * x) * np.exp(-np.pi**2 * t)
 
 def main():
+    """Testing the neural network"""
     rng = np.random.default_rng()
 
     # Settings for neural network
@@ -65,7 +69,7 @@ def main():
     # optimizer = tf.keras.optimizers.Adam(learning_rate=6e-1)
 
     model = create_model(
-        func=initial_condition,
+        initial_conditions=initial_condition,
         hidden_layers=hidden_layers,
         activation=activation,
         initializer=initializer

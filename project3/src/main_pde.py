@@ -1,33 +1,29 @@
+"""Solving a PDE numerically"""
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
+
+import pde_solver
+
+
 #matplotlib updates
 matplotlib.rcParams.update({'font.size': 16})
 # plt.rcParams["font.family"] = "serif"
 plt.rcParams["text.usetex"] = True
 plt.rcParams.update({'figure.autolayout': True})
-from matplotlib.lines import Line2D
-from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,
-                               AutoMinorLocator)
+# from matplotlib.lines import Line2D
+# from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,
+#                                AutoMinorLocator)
 
-import pde_solver
 
 
 def part_b():
-
-    #-----------------------------------------------------------------------#
-    # Uses the forward euler method in pde_solver.py to solve the 1D 
-    # diffusion equation with D = 1. 
-    #
-    # Plots the solution as 2d colour gradients for 2 different values of 
-    # x and t.
-    #
-    # Compares with analytical results and plots square error
-    #
-    # NB:
-    # Figures are rasterized to save time/space when saving them
-    #-----------------------------------------------------------------------#
-
+    """Uses the forward Euler method from pde_solver.py to solve the 1d
+    diffusion equation with D = 1. Plots the solution as 2d colour gradients
+    for 2 different values of x and t. Compares with analytical results and
+    plots square error.
+    NB: Figures are rasterized to save time/space when saving them
+    """
     # Set initial conditions
     dx_1 = 1/10
     dx_2 = 1/100
@@ -36,28 +32,28 @@ def part_b():
     Tmax_2 = 0.5
 
     # Sol 1, 1
-    u_1, x_1, t_1 = pde_solver.forwardEuler(dx_1, Tmax_1)
+    u_1, x_1, t_1 = pde_solver.forward_euler(dx_1, Tmax_1)
     # Meshgrid and analytical solution
     X_1, T_1 = np.meshgrid(x_1, t_1)
-    U_anlytic_1 = pde_solver.analyticalSolution(X_1, T_1)
+    U_analytic_1 = pde_solver.analytical_solution(X_1, T_1)
 
     # Sol 2, 2
-    u_2, x_2, t_2 = pde_solver.forwardEuler(dx_2, Tmax_2)
+    u_2, x_2, t_2 = pde_solver.forward_euler(dx_2, Tmax_2)
     # Meshgrid and analytical solution
     X_2, T_2 = np.meshgrid(x_2, t_2)
-    U_anlytic_2 = pde_solver.analyticalSolution(X_2, T_2)
+    U_analytic_2 = pde_solver.analytical_solution(X_2, T_2)
 
     # Compute relative errors
-    sqr_error_1 = pde_solver.sqr_err(U_anlytic_1, u_1)
-    rel_err_1 = pde_solver.rel_err(u_1[:, 1:-1], U_anlytic_1[:, 1:-1])
+    sqr_error_1 = pde_solver.sqr_err(U_analytic_1, u_1)
+    rel_err_1 = pde_solver.rel_err(u_1[:, 1:-1], U_analytic_1[:, 1:-1])
     mse_1 = np.zeros(len(t_1))
     rel_1 = np.zeros(len(t_1))
     for i in range(len(t_1)):
         mse_1[i] = np.mean(sqr_error_1[i])
         rel_1[i] = np.mean(rel_err_1[i])
 
-    sqr_error_2 = pde_solver.sqr_err(U_anlytic_2, u_2)
-    rel_err_2 = pde_solver.rel_err(U_anlytic_2[:, 1:-1], u_2[:, 1:-1])
+    sqr_error_2 = pde_solver.sqr_err(U_analytic_2, u_2)
+    rel_err_2 = pde_solver.rel_err(U_analytic_2[:, 1:-1], u_2[:, 1:-1])
     mse_2 = np.zeros(len(t_2))
     rel_2 = np.zeros(len(t_2))
     for i in range(len(mse_2)):
@@ -118,7 +114,13 @@ def part_b():
 
     # Plots of relative error
     fig5, axs5 = plt.subplots(1, 2, figsize=(12,8))
-    pan5 = axs5[0].pcolormesh(X_1[:,1:-1], T_1[:,1:-1], rel_err_1, cmap='gist_ncar', rasterized=True)
+    pan5 = axs5[0].pcolormesh(
+        X_1[:,1:-1],
+        T_1[:,1:-1],
+        rel_err_1,
+        cmap='gist_ncar',
+        rasterized=True
+    )
     axs5[0].set_xlabel(r'$x$')
     axs5[0].set_ylabel(r'$t$')
     cbar = fig5.colorbar(pan5, ax=axs5[0])

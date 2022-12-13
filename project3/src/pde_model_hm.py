@@ -1,8 +1,13 @@
+"""Neural network model to solve a PDE
+
+The training step of keras.Model is overriden to solve an ordinary differential
+equation.
+"""
 import tensorflow as tf
 from tensorflow import GradientTape
 
 class PDEModel(tf.keras.Model):
-    # Keras model with custom training step
+    """Keras model with custom training step"""
     def __init__(self, loss, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.ode_loss = loss
@@ -45,7 +50,7 @@ class PDEModel(tf.keras.Model):
 
 
 class ConditionLayer(tf.keras.layers.Layer):
-    # Layer which forces initial conditions on the network
+    """Layer which forces initial conditions on the network"""
     def __init__(self, x, t, func):
         super(ConditionLayer, self).__init__()
         self.x = x
