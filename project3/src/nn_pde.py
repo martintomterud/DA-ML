@@ -3,6 +3,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
 
+import matplotlib
+matplotlib.rcParams.update({'font.size': 16})
+plt.rcParams["font.family"] = "serif"
+
 import pde_solver
 from pde_model_hm import ConditionLayer, PDEModel
 
@@ -55,7 +59,7 @@ def f_analytic(x, t):
     """Gives the analytic solution of the PDE for testing"""
     return np.sin(np.pi * x) * np.exp(-np.pi**2 * t)
 
-def main():
+def main(N_train):
     """Testing the neural network"""
     rng = np.random.default_rng()
 
@@ -76,8 +80,8 @@ def main():
     )
     model.compile(optimizer=optimizer)
 
-    N_train = 200
-    N_test = 100
+    #N_train = 10
+    N_test = 1000
     epochs = 400
 
     T = .5
@@ -94,12 +98,16 @@ def main():
     f_anal = f_analytic(x_test, t_test)
 
     sqr_err = pde_solver.sqr_err(f_pred, f_anal)
+    print(sqr_err.shape)
     rel_err = pde_solver.rel_err(f_pred, f_anal)
 
     fig, ax = plt.subplots()
     im = ax.scatter(x_test, t_test, c=f_pred, cmap="Reds")
-    fig.colorbar(im, ax=ax)
-    fig.savefig("nn_pred.pdf")
+    plt.xlabel(r'$x$')
+    plt.ylabel(r'$t$')
+    fig.colorbar(im, ax=ax, label = r'$u(x, t)$')
+
+    fig.savefig("nn_pred_100.pdf")
 
     # fig2, ax2 = plt.subplots()
     # im2 = ax2.scatter(x_test, t_test, c=f_anal, cmap="Reds")
@@ -108,8 +116,10 @@ def main():
 
     fig, ax = plt.subplots()
     im = ax.scatter(x_test, t_test, c=sqr_err, cmap="Reds")
-    fig.colorbar(im, ax=ax)
-    fig.savefig("nn_sqr_err.pdf")
+    plt.xlabel(r'$x$')
+    plt.ylabel(r'$t$')
+    fig.colorbar(im, ax=ax, label = 'Square Error')
+    fig.savefig("nn_sqr_err_100.pdf")
 
     fig, ax = plt.subplots()
     im = ax.scatter(x_test, t_test, c=rel_err, cmap="Reds")
@@ -118,4 +128,7 @@ def main():
 
     return 0
 
-main()
+# Execute main for the number of desired training points
+
+#main(10)
+main(100)
