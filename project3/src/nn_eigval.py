@@ -102,6 +102,7 @@ def nn_eigval(
 
     # Storing eigenvector as we progress
     eig_vec_container = []
+    eig_val_container = []
     # Start session
     with tf.Session() as session:
         initial = tf.global_variables_initializer()
@@ -112,6 +113,7 @@ def nn_eigval(
             eigen_vec = x_trial.eval()
             eig_vec_container.append(eigen_vec)
             eigen_val = ((eigen_vec @ (matrix @ eigen_vec.T)) / (eigen_vec @ eigen_vec.T)) [0, 0]
+            eig_val_container.append(eigen_val)
             delta_eig_val = np.abs(old_eigen_val - eigen_val)
             old_eigen_val = eigen_val
             # Progress bar
@@ -122,4 +124,4 @@ def nn_eigval(
             # if delta_eig_val < delta_treshold:
             #     break
 
-    return eigen_val, np.asarray(eig_vec_container), i
+    return np.asarray(eig_val_container), np.asarray(eig_vec_container), i
