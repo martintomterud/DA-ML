@@ -44,11 +44,11 @@ class ODEModel(tf.keras.Model):
 
 class ConditionLayer(tf.keras.layers.Layer):
     """Layer forces initial conditions on the network"""
-    def __init__(self, x, func):
+    def __init__(self, x, initial_conditions):
         super(ConditionLayer, self).__init__()
         self.x = x
-        self.func = func
+        self.initial_conditions = initial_conditions
 
     def __call__(self, nn):
         # Function defining the initial conditions
-        return self.func(self.x, nn)
+        return self.initial_conditions(self.x, nn)

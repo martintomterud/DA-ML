@@ -7,7 +7,7 @@ import numpy as np
 #   I have just copy-pasted the ODE model and
 #   altered the custom cost function call
 #   so we can implement MSE between du_d2x and du_dt
-#    as well as including a t tensor where only x tensor was before
+#   as well as including a t tensor where only x tensor was before
 
 def prepare_arrays(grid_size, L, T):
     """
