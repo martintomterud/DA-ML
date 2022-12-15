@@ -1,14 +1,17 @@
 """Solves a PDE with the use of a neural network"""
-import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
-
 import matplotlib
-matplotlib.rcParams.update({'font.size': 16})
-plt.rcParams["font.family"] = "serif"
+import matplotlib.pyplot as plt
 
 import pde_solver
 from pde_model_hm import ConditionLayer, PDEModel
+
+matplotlib.rcParams.update({'font.size': 16})
+plt.rcParams["text.usetex"] = True
+plt.rcParams.update({'figure.autolayout': True})
+plt.rcParams["font.family"] = "serif"
+
 
 
 def create_model(
@@ -80,8 +83,8 @@ def main(N_train):
     )
     model.compile(optimizer=optimizer)
 
-    #N_train = 10
-    N_test = 1000
+    # N_train = 10
+    N_test = 100
     epochs = 400
 
     T = .5
@@ -90,45 +93,44 @@ def main(N_train):
 
     model.fit([x_train, t_train], epochs=epochs)
 
-    x_test = rng.random((N_test, 1), dtype="float32")
-    t_test = T * rng.random((N_test, 1), dtype="float32")
+    x = np.linspace(0, 1., N_test+1, dtype="float32")
+    t = np.linspace(0, .5, N_test+1, dtype="float32")
+    x_mesh, t_mesh = np.meshgrid(x, t)
+    x_test = x_mesh.reshape(-1, 1)
+    t_test = t_mesh.reshape(-1, 1)
 
     f_pred = model.predict([x_test, t_test])
+    f_mesh = f_pred.reshape(x_mesh.shape)
 
-    f_anal = f_analytic(x_test, t_test)
+    f_anal = f_analytic(x_mesh, t_mesh)
 
-    sqr_err = pde_solver.sqr_err(f_pred, f_anal)
-    print(sqr_err.shape)
-    rel_err = pde_solver.rel_err(f_pred, f_anal)
+    sqr_err = pde_solver.sqr_err(f_mesh, f_anal)
+    # rel_err = pde_solver.rel_err(f_mesh, f_anal)
 
-    fig, ax = plt.subplots()
-    im = ax.scatter(x_test, t_test, c=f_pred, cmap="Reds")
-    plt.xlabel(r'$x$')
-    plt.ylabel(r'$t$')
-    fig.colorbar(im, ax=ax, label = r'$u(x, t)$')
+    fig, ax = plt.subplots(figsize=(8,8))
+    pan1 = ax.pcolormesh(x_mesh, t_mesh, f_mesh, cmap='Reds', rasterized=True)
+    ax.set_xlabel(r'$x$')
+    ax.set_ylabel(r'$t$')
+    cbar = fig.colorbar(pan1, ax=ax)
+    cbar.set_label(r'$u(x, t)$')
+    fig.savefig("nn_pred" + str(N_train) + ".pdf", bbox_inches='tight')
 
-    fig.savefig("nn_pred_100.pdf")
-
-    # fig2, ax2 = plt.subplots()
-    # im2 = ax2.scatter(x_test, t_test, c=f_anal, cmap="Reds")
-    # fig2.colorbar(im2, ax=ax2)
-    # fig2.savefig("nn_analytic.pdf")
-
-    fig, ax = plt.subplots()
-    im = ax.scatter(x_test, t_test, c=sqr_err, cmap="Reds")
+    fig, ax = plt.subplots(figsize=(8,8))
+    im = ax.pcolormesh(x_mesh, t_mesh, sqr_err, cmap="Greys", rasterized=True)
     plt.xlabel(r'$x$')
     plt.ylabel(r'$t$')
     fig.colorbar(im, ax=ax, label = 'Square Error')
-    fig.savefig("nn_sqr_err_100.pdf")
+    fig.savefig("nn_sqr_err" + str(N_train) + ".pdf", bbox_inches='tight')
 
-    fig, ax = plt.subplots()
-    im = ax.scatter(x_test, t_test, c=rel_err, cmap="Reds")
-    fig.colorbar(im, ax=ax)
-    fig.savefig("nn_rel_err.pdf")
+    # fig, ax = plt.subplots()
+    # im = ax.pcolormesh(x_mesh, t_mesh, rel_err, cmap="Greys", rasterized=True)
+    # fig.colorbar(im, ax=ax)
+    # fig.savefig("nn_rel_err"+ str(N_train) + ".pdf", bbox_inches='tight')
 
     return 0
 
 # Execute main for the number of desired training points
 
-#main(10)
-main(100)
+if __name__ == "__main__":
+    main(10)
+    main(100)

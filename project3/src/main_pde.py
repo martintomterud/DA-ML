@@ -71,12 +71,12 @@ def part_b():
     plt.savefig('num_u10.pdf', bbox_inches='tight')
 
     fig2, axs2 = plt.subplots(1, 2, figsize=(12,8))
-    pan2 = axs2[0].pcolormesh(X_1, T_1, sqr_error_1, cmap='gist_ncar', rasterized=True)
+    pan2 = axs2[0].pcolormesh(X_1, T_1, sqr_error_1, cmap='Greys', rasterized=True)
     axs2[0].set_xlabel(r'$x$')
     axs2[0].set_ylabel(r'$t$')
     cbar = fig2.colorbar(pan2, ax=axs2[0])
     cbar.set_label(r'Squared error')
-    axs2[1].plot(t_1, mse_1, lw=2, alpha=0.7, color='r')
+    axs2[1].plot(t_1, mse_1, lw=2, alpha=0.7, color='k')
     axs2[1].yaxis.set_label_position('right')
     axs2[1].yaxis.tick_right()
     axs2[1].set_xlabel(r'$t$')
@@ -96,7 +96,7 @@ def part_b():
     plt.savefig('num_u100.pdf', bbox_inches='tight')
 
     fig4, axs4 = plt.subplots(1, 2, figsize=(12,8))
-    pan4 = axs4[0].pcolormesh(X_2, T_2, sqr_error_2, cmap='binary', rasterized=True)
+    pan4 = axs4[0].pcolormesh(X_2, T_2, sqr_error_2, cmap='Greys', rasterized=True)
     axs4[0].set_xlabel(r'$x$')
     axs4[0].set_ylabel(r'$t$')
     cbar = fig4.colorbar(pan4, ax=axs4[0])
@@ -134,7 +134,7 @@ def part_b():
     axs5[1].tick_params(axis='x', top=True, direction='in', length=10)
     axs5[1].tick_params(axis='y', which='minor', right=True, direction='in', length=5)
     axs5[1].tick_params(axis='y', right=True, direction='in', length=10)
-    fig5.savefig("num_rel_err10")
+    fig5.savefig("num_rel_err10.pdf")
 
     fig6, axs6 = plt.subplots(1, 2, figsize=(12,8))
     pan6 = axs6[0].pcolormesh(X_2[:,1:-1], T_2[:,1:-1], rel_err_2, cmap='Greys', rasterized=True)

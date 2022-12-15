@@ -34,14 +34,14 @@ def forward_euler(dx, T, L=1., D=1.):
     """
     # 1. Set up x array.
     Nx = int(L/dx)         # Number of points determined by length and spacing
-    print(L, dx, Nx)
+    # print(L, dx, Nx)
     x = np.linspace(0., L, Nx + 1)
 
     # 2. Set up t array
     # dt determined by  D * dt / (dx)**2 <= 1/2
     dt = dx**2 / (2*D)
     Nt = int(T/dt)
-    print(dt, Nt)
+    # print(dt, Nt)
     t = np.linspace(0, T, Nt + 1)
 
     a = dt/(dx)**2

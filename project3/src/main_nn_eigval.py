@@ -2,10 +2,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
+
+import nn_eigval
+
 matplotlib.rcParams.update({'font.size': 16})
 plt.rcParams["font.family"] = "serif"
 
-import nn_eigval
 
 # To choose correct eigenvalue
 def find_nearest(array, value):
@@ -13,17 +15,18 @@ def find_nearest(array, value):
     idx = (np.abs(array - value)).argmin()
     return idx
 
+
 def main(guess):
     """Testing the neural network"""
     # Same seed for all to debug
-    np.random.seed(42)
+    # np.random.seed(42)
 
     # Set all constants
     matrix_size = 6
-    hidden_neurons = 50
-    num_layers = 4
-    max_epoch = 400
-    learning_rate = 0.001
+    hidden_neurons = 10
+    num_layers = 1
+    max_epoch = 4000
+    learning_rate = 1e-3
     delta_treshold = 1e-17
     verbose = True
 
@@ -42,34 +45,42 @@ def main(guess):
         verbose
     )
 
-    eigvalIDX = find_nearest(eig_vals, tf_eig_vals[-1])
+    eigval_idx = find_nearest(eig_vals, tf_eig_vals[-1])
 
     # Normalize eigenvectros given by nn
     normalized_eigvecs = np.zeros((max_epoch, 1, matrix_size))
     for i in range(max_epoch):
         normalized_eigvecs[i, 0, :] = (tf_eig_vecs[i, 0, :] / np.linalg.norm(tf_eig_vecs[i, 0, :]))
-    plt.figure()
 
-    #Checks
-    print(tf_eig_vals[-1], eig_vals)
-    print((M @ tf_eig_vecs[-1].T))
-    print(tf_eig_vals[-1] * tf_eig_vecs[-1])
-    print(eig_vals[0]*eig_vecs[0], M @ eig_vecs[0])
+    if np.sign(eig_vecs[eigval_idx, 0]) != np.sign(normalized_eigvecs[-1, 0, 0]):
+        eig_vecs = -eig_vecs
+
+    # print("Matching index")
+    # print(eigval_idx)
+    # print(eig_vals[eigval_idx])
+
+    # print(eig_vecs)
+    # #Checks
+    # print(tf_eig_vals[-1], eig_vals)
+    # print((M @ tf_eig_vecs[-1].T))
+    # print(tf_eig_vals[-1] * tf_eig_vecs[-1])
+    # print(eig_vals[0]*eig_vecs[0], M @ eig_vecs[0])
 
     # Compute mean square error
     mse = np.zeros(max_epoch)
-    true_vec = eig_vals[eigvalIDX] * eig_vecs[eigvalIDX]
+    true_vec = eig_vals[eigval_idx] * eig_vecs[eigval_idx]
     for i in range(max_epoch):
         computed_vec = tf_eig_vals[i] * normalized_eigvecs[i, 0, :]
         sqr_error = (true_vec - computed_vec)**2
         mse[i] = np.mean(sqr_error)
 
-
     t = np.linspace(0, max_iter_step+1, max_iter_step+1)
+
+    plt.figure()
     for i in range(matrix_size):
         plt.plot(t, normalized_eigvecs[:, 0, i])
     for i in range(matrix_size):
-        plt.axhline(y = eig_vecs[eigvalIDX, i], ls = 'dashed', alpha = 0.7)
+        plt.axhline(y = eig_vecs[eigval_idx, i], ls = 'dashed', alpha = 0.7)
     plt.xlabel('Epoch')
     plt.ylabel('Value of vector component')
     plt.title(r'$\lambda = $' + str(np.round(tf_eig_vals[-1], 2)))
@@ -85,4 +96,4 @@ def main(guess):
 
 if __name__ == "__main__":
     main(-50)
-    main(-50)
+    # main(-50)

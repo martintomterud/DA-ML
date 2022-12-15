@@ -7,7 +7,7 @@ from ode_model import ODEModel, ConditionLayer
 
 
 def create_model(
-    func,
+    initial_conditions,
     hidden_layers=[10,],
     activation=tf.keras.activations.sigmoid,
     initializer=tf.keras.initializers.GlorotNormal(seed=42)
@@ -30,7 +30,7 @@ def create_model(
         bias_regularizer=initializer
     )(nn)
 
-    u = ConditionLayer(x, func)(nn)
+    u = ConditionLayer(x, initial_conditions)(nn)
 
     return ODEModel(ode_loss, inputs=x, outputs=u)
 
@@ -67,7 +67,7 @@ def main():
 
     model = create_model(
         hidden_layers=hidden_layers,
-        func=initial_condition,
+        initial_conditions=initial_condition,
         activation=activation,
         initializer=initializer
     )

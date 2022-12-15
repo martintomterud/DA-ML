@@ -15,14 +15,15 @@ class ODEModel(tf.keras.Model):
         self.loss_tracker = tf.keras.metrics.Mean(name="loss")
 
     def train_step(self, data):
+        print(data.shape)
         with GradientTape(persistent=True) as tape:
             tape.watch(data)
             # Forward pass
             func = self(data, training=True)
             # Compute derivative of 'func'
-            df_dx = tape.gradient(func, data)
+            df = tape.gradient(func, data)
             # Compute costum loss
-            loss = self.ode_loss(func, df_dx)
+            loss = self.ode_loss(func, df)
 
         # Compute gradients
         trainable_vars = self.trainable_variables
@@ -49,6 +50,6 @@ class ConditionLayer(tf.keras.layers.Layer):
         self.x = x
         self.initial_conditions = initial_conditions
 
-    def __call__(self, nn):
+    def __call__(self, nn, *args, **kwargs):
         # Function defining the initial conditions
         return self.initial_conditions(self.x, nn)
