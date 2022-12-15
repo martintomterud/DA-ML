@@ -17,7 +17,7 @@ plt.rcParams.update({'figure.autolayout': True})
 
 
 
-def part_b():
+def pde_numeric():
     """Uses the forward Euler method from pde_solver.py to solve the 1d
     diffusion equation with D = 1. Plots the solution as 2d colour gradients
     for 2 different values of x and t. Compares with analytical results and
@@ -112,47 +112,8 @@ def part_b():
     axs4[1].tick_params(axis='y', right=True, direction='in', length=10)
     plt.savefig('num_err100.pdf', bbox_inches='tight')
 
-    # Plots of relative error
-    fig5, axs5 = plt.subplots(1, 2, figsize=(12,8))
-    pan5 = axs5[0].pcolormesh(
-        X_1[:,1:-1],
-        T_1[:,1:-1],
-        rel_err_1,
-        cmap='gist_ncar',
-        rasterized=True
-    )
-    axs5[0].set_xlabel(r'$x$')
-    axs5[0].set_ylabel(r'$t$')
-    cbar = fig5.colorbar(pan5, ax=axs5[0])
-    cbar.set_label(r'Relative error')
-    axs5[1].plot(t_1, rel_1, lw=2, alpha=0.7, color='r')
-    axs5[1].yaxis.set_label_position('right')
-    axs5[1].yaxis.tick_right()
-    axs5[1].set_xlabel(r'$t$')
-    axs5[1].set_ylabel(r'Relative error')
-    axs5[1].tick_params(axis='x', which='minor', top=True, direction='in', length=5)
-    axs5[1].tick_params(axis='x', top=True, direction='in', length=10)
-    axs5[1].tick_params(axis='y', which='minor', right=True, direction='in', length=5)
-    axs5[1].tick_params(axis='y', right=True, direction='in', length=10)
-    fig5.savefig("num_rel_err10.pdf")
-
-    fig6, axs6 = plt.subplots(1, 2, figsize=(12,8))
-    pan6 = axs6[0].pcolormesh(X_2[:,1:-1], T_2[:,1:-1], rel_err_2, cmap='Greys', rasterized=True)
-    axs6[0].set_xlabel(r'$x$')
-    axs6[0].set_ylabel(r'$t$')
-    cbar = fig6.colorbar(pan6, ax=axs6[0])
-    cbar.set_label(r'Relative error')
-    axs6[1].plot(t_2, rel_2, lw=2, alpha=0.7, color='k')
-    axs6[1].yaxis.set_label_position('right')
-    axs6[1].yaxis.tick_right()
-    axs6[1].set_xlabel(r'$t$')
-    axs6[1].set_ylabel(r'Relative error')
-    axs6[1].tick_params(axis='x', which='minor', top=True, direction='in', length=5)
-    axs6[1].tick_params(axis='x', top=True, direction='in', length=10)
-    axs6[1].tick_params(axis='y', which='minor', right=True, direction='in', length=5)
-    axs6[1].tick_params(axis='y', right=True, direction='in', length=10)
-    fig6.savefig("num_rel_err100.pdf")
-
     return 0
 
-part_b()
+
+if __name__ == "__main__":
+    pde_numeric()

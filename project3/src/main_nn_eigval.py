@@ -55,17 +55,6 @@ def main(guess):
     if np.sign(eig_vecs[eigval_idx, 0]) != np.sign(normalized_eigvecs[-1, 0, 0]):
         eig_vecs = -eig_vecs
 
-    # print("Matching index")
-    # print(eigval_idx)
-    # print(eig_vals[eigval_idx])
-
-    # print(eig_vecs)
-    # #Checks
-    # print(tf_eig_vals[-1], eig_vals)
-    # print((M @ tf_eig_vecs[-1].T))
-    # print(tf_eig_vals[-1] * tf_eig_vecs[-1])
-    # print(eig_vals[0]*eig_vecs[0], M @ eig_vecs[0])
-
     # Compute mean square error
     mse = np.zeros(max_epoch)
     true_vec = eig_vals[eigval_idx] * eig_vecs[eigval_idx]
@@ -92,7 +81,8 @@ def main(guess):
     plt.ylabel('MSE')
     plt.savefig('NN_eigval_MSE_min.pdf', bbox_inches = 'tight')
 
-    plt.show()
+    return 0
+
 
 if __name__ == "__main__":
     main(-50)

@@ -13,7 +13,6 @@ plt.rcParams.update({'figure.autolayout': True})
 plt.rcParams["font.family"] = "serif"
 
 
-
 def create_model(
     initial_conditions,
     hidden_layers=[10,],

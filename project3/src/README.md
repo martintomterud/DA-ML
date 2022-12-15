@@ -3,16 +3,21 @@
 ## Source files
 The following files contains code used by the run files
 
- - `nn_eigval.py`: Tensorflow 1 implementation of neural network (NN) that solves for eigenvalues
- - `ode_model.py`: NN that solves an example ODE
- - `pde_model.py`: NN that solves the heat eq.
- - `pde_solver.py`: Implementation of the forward euler algorithm to solve heat equation.
+ - `pde_solver.py`: Implementation of the forward Euler algorithm to solve the 
+    heat equation.
+ - `pde_model.py`: Neural network that solves the heat equation.
+ - `nn_eigval.py`: Tensorflow 1 implementation of neural network that solves 
+    for eigenvalues.
+ - `ode_model.py`: Neural network that solves an ODE. (Not used in report.)
 
 ## Run files
-The following files can be executed to solve the project
+The following files can be executed to solve the project. The first three are called by `../main.py`
 
- - `main_nn_eigval.py`: Executes eigenvalue NN and solves for largest and smallest eigenvalue.
- - `main_pde.py`: Executes forward euler solution to heat equation. 
- - `nn_eigval_hm.py`: Short implementation of the SGD theory in the paper that solves for eigenvalues without NN.
- - `nn_ode.py`: Executes NN that solves an example ODE.
- - `nn_pde.py`: Executes NN that solves heat equation.
+ - `main_pde.py`: Executes forward Euler solution to heat equation.
+ - `nn_pde.py`: Executes neural network that solves heat equation.
+ - `main_nn_eigval.py`: Executes eigenvalue NN and solves for largest and 
+    smallest eigenvalue.
+ - `nn_eigval_hm.py`: Short implementation of the SGD theory in the paper that 
+    solves for eigenvalues without NN.
+ - `nn_ode.py`: Executes neural network that solves an ODE. (Not used in 
+    report.).
