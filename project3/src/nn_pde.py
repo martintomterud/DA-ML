@@ -5,7 +5,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 
 import pde_solver
-from pde_model_hm import ConditionLayer, PDEModel
+from pde_model import ConditionLayer, PDEModel
 
 matplotlib.rcParams.update({'font.size': 16})
 plt.rcParams["text.usetex"] = True
@@ -122,15 +122,10 @@ def main(N_train):
     fig.colorbar(im, ax=ax, label = 'Square Error')
     fig.savefig("nn_sqr_err" + str(N_train) + ".pdf", bbox_inches='tight')
 
-    # fig, ax = plt.subplots()
-    # im = ax.pcolormesh(x_mesh, t_mesh, rel_err, cmap="Greys", rasterized=True)
-    # fig.colorbar(im, ax=ax)
-    # fig.savefig("nn_rel_err"+ str(N_train) + ".pdf", bbox_inches='tight')
-
     return 0
 
-# Execute main for the number of desired training points
 
+# Execute main for the desired number of training points
 if __name__ == "__main__":
     main(10)
     main(100)

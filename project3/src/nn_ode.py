@@ -46,13 +46,14 @@ def initial_condition(x, neural_network):
     """
     return 10. + x * neural_network
 
+
 def u_analytic(x, u_0=10., gamma=2.):
     """Gives the analytic solution to the ODE for comparison"""
     return u_0 * np.exp(-gamma * x)
 
 
 def main():
-    """Testing the neural network"""
+    """Testing the ODE solver"""
     rng = np.random.default_rng()
 
     # Settings for neural network
@@ -89,5 +90,8 @@ def main():
     ax.plot(x_test, u_anal, '.')
     fig.savefig("nn_ode.pdf")
 
+    return 0
 
-main()
+
+if __name__ == "__main__":
+    main()

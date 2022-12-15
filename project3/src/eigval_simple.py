@@ -36,9 +36,6 @@ def attempt(matrix_size, n, lr=1e-3, rng=np.random.default_rng()):
     print("Numpy eigenvectors:")
     print(eigenvecs[:,-1])
 
-    # fig, ax = plt.subplots()
-    # ax.plot()
-
 
 def main():
     """Testing eigensolving"""
