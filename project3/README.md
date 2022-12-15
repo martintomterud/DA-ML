@@ -1,7 +1,9 @@
 # Project 3
 
-## Overview of file structure 
+## Machine learning applied to PDEs and Eigenvalues
 
- - figs contain the figures included in our report
- - report containts the .tex, .bib, and .pdf of our report
- - src contains all code and a README describing its use
+### Overview of file structure 
+
+ - `figs` contain the figures included in our report
+ - `report` containts the `.tex`, `.bib`, and `.pdf` of our report
+ - `src` contains all code and a `README.md` describing its use
